@@ -1,0 +1,500 @@
+---
+title: "NLP Demo"
+author: "Philip D. Waggoner"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## NLP, Topic Models, and Sentiment Analysis
+
+```{r }
+# Mining SOTU Addresses, George Washington - Barack Obama
+
+# Load some libraries
+library(tidyverse)
+library(tidytext)
+library(tm)
+library(sotu)
+library(igraph) # for graph_from_data_frame function
+library(ggraph) # for network plot
+library(quanteda)
+library(wordcloud)
+library(topicmodels)
+
+# Call and attach the data: bind the speech meta data with the raw text of the speeches
+sotu_meta$text <- sotu_text
+
+# Unnest tokens: token per speech, per row
+(unt_sotu <- sotu_meta %>%
+  unnest_tokens(output = word, 
+                input = text))
+
+# Omit stop words for targeted exploration; which one's are in tidytext?
+as_tibble(stop_words)
+
+stops_sotu <- unt_sotu %>%
+  anti_join(stop_words, 
+            by = "word") # drop words in stop words data by "unjoining" them from the df
+
+# what happened to the full data?
+```
+
+
+```{r }
+# inspect words numerically and visually
+stops_sotu %>%
+  group_by(year) %>%
+  summarise(all_words = length(word)) %>%
+  arrange(desc(all_words)) %>% 
+  as_tibble()
+
+stops_sotu %>%
+  count(word, 
+        sort = TRUE)
+
+stops_sotu %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 1900) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Term",
+       y = "Count") +
+  theme_bw()
+
+# what do you see? Is this what you'd expect?
+# can we drill down to make these data more accessible?
+```
+
+
+
+```{r }
+## Case study: Obama 
+# Start with bigrams exploration -- string of consecutive tokens
+(obama_bigrams <- sotu_meta %>%
+  filter(year > 2008 & year <= 2016) %>%
+  unnest_tokens(output = bigram, 
+                input = text, 
+                token = "ngrams", 
+                n = 2, 
+                to_lower =   FALSE) %>% 
+  separate(bigram, c("unigram_1", "unigram_2"), 
+                      sep = " ") %>% 
+  filter(!unigram_1 %in% stop_words$word) %>%
+  filter(!unigram_2 %in% stop_words$word))
+
+for (i in seq(obama_bigrams)) {
+  obama_bigrams[[i]] <- gsub("Mr", " ", obama_bigrams[[i]])
+  obama_bigrams[[i]] <- gsub("Madam", " ", obama_bigrams[[i]])
+}; obama_bigrams
+
+obama_bigrams <- obama_bigrams[!(obama_bigrams$unigram_1 == " " | 
+                                 obama_bigrams$unigram_2 == " "), ]; obama_bigrams
+```
+
+
+```{r }
+## explore combinations based on the second unigram
+# campaign
+obama_bigrams %>%
+  filter(unigram_2 == "campaign") %>%
+  count(president, unigram_1, sort = TRUE)
+
+obama_bigrams %>%
+  filter(unigram_2 == "change") %>%
+  count(president, unigram_1, sort = TRUE)
+
+# domestic policy
+obama_bigrams %>%
+  filter(unigram_2 == "economy") %>%
+  count(president, unigram_1, sort = TRUE)
+
+obama_bigrams %>%
+  filter(unigram_2 == "immigration") %>%
+  count(president, unigram_1, sort = TRUE)
+
+# foreign policy
+obama_bigrams %>%
+  filter(unigram_2 == "war") %>%
+  count(president, unigram_1, sort = TRUE)
+
+obama_bigrams %>%
+  filter(unigram_2 == "peace") %>%
+  count(president, unigram_1, sort = TRUE)
+
+# so what can we deduce from Obama's policy priorities based on the simple EDA thus far?
+```
+
+
+
+```{r }
+## Visualize a network-style representation of bigram usage
+network_sotu <- obama_bigrams %>% 
+  count(unigram_1, unigram_2, sort = TRUE) %>% 
+  filter(n > 8) %>%
+  graph_from_data_frame()
+
+set.seed(89235) 
+
+ggraph(network_sotu, layout = "kk") +
+  geom_edge_link() +
+  geom_node_point() +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  xlim(-9, 3.25) +
+  theme_bw() 
+```
+
+
+```{r }
+# shade based on density of connections
+set.seed(89235) 
+
+ggraph(network_sotu, layout = "kk") +
+  geom_edge_link(alpha = 0.35) +
+  geom_edge_density() +
+  geom_node_point() +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  xlim(-9, 3.65) +
+  theme_bw() 
+```
+
+
+```{r }
+# or as a circle
+set.seed(89235) 
+
+ggraph(network_sotu, layout = 'linear', circular = TRUE) +
+  geom_edge_link() +
+  geom_node_point() +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  xlim(-1.25, 1) +
+  theme_bw()
+```
+
+
+
+
+```{r }
+## Perhaps Obama is relatively fresh in your mind; Let's go back to Lincoln to explore a bit
+# Start with bigrams
+(lincoln_bigrams <- sotu_meta %>%
+    filter(year > 1860 & year < 1865) %>%
+    unnest_tokens(bigram, text, 
+                  token = "ngrams", 
+                  n = 2, 
+                  to_lower =   FALSE) %>% 
+    separate(bigram, c("unigram_1", "unigram_2"), 
+             sep = " ") %>% 
+    filter(!unigram_1 %in% stop_words$word) %>%
+    filter(!unigram_2 %in% stop_words$word))
+
+lincoln_bigrams %>%
+  filter(unigram_2 == "war") %>%
+  count(president, unigram_1, sort = TRUE)
+
+# sure enough - seems like the civil war was on his mind....
+```
+
+
+
+```{r }
+
+## We can zoom into a unique term/keyword with context via kwic() from quanteda 
+# (requires a "corpus" class, i.e., put text back in one cell per speech)
+
+lincoln_nest <- stops_sotu %>%
+  filter(year > 1860 & year < 1865) %>%
+  select(year, word) %>%
+  nest(word) %>%
+  mutate(text = map(data, unlist),
+         text = map_chr(text, paste, collapse = " "))
+
+lincoln <- with(lincoln_nest, 
+                      VCorpus(VectorSource(text)))
+
+# Light preprocessing
+lincoln %>% 
+  tm_map(stripWhitespace) %>% 
+  tm_map(removeNumbers) %>% 
+  tm_map(removePunctuation) %>% 
+  tm_map(content_transformer(tolower))
+
+# quick wordcloud distribution of 150 most frequently used words
+set.seed(2305)
+wordcloud(lincoln,
+          max.words = 150,
+          colors = brewer.pal(8, "Dark2"),
+          random.order = FALSE, 
+          rot.per = 0.30, 
+          random.color = TRUE)
+
+```
+
+
+```{r }
+# War seems to be a big theme (perhaps for obvious reasons); 
+# what's the context surround its use? --> KWIC!
+# OUTPUT: document/speech number, keyword starting character number; 2 words prior and post keyword
+kwic(x = lincoln_nest$text, 
+     pattern = "war", 
+     window = 2)
+```
+
+
+
+
+```{r }
+#
+# Dive a bit deeper
+#
+
+
+### Sentiment analysis
+
+# dictionaries from tidytext:
+# 1. bing: binary negative/positive 
+# 2. afinn: categorizes words negative to positive, from -5 to +5
+# 3. loughran: six categories: constraining, litigious, negative, positive, superfluous, and uncertainty 
+# 4. nrc: ten categories: anger, anticipation, disgust, fear, joy, negative, positive, sadness, surprise, and trust
+get_sentiments("bing")
+get_sentiments("afinn")
+get_sentiments("loughran")
+get_sentiments("nrc")
+
+# Which key words are driving sentiments?
+stops_sotu %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE)
+
+# Let's see how Lincoln talked about stuff, whether with sadness or joy, in (what should be) a diplomatic, "strong" address
+sad <- get_sentiments("nrc") %>% 
+  filter(sentiment == "sadness")
+
+stops_sotu %>%
+  filter(year > 1860 & year < 1865) %>%
+  inner_join(sad) %>%
+  count(word, 
+        sort = TRUE)
+
+joy <- get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")
+
+stops_sotu %>%
+  filter(year > 1860 & year < 1865) %>%
+  inner_join(joy) %>%
+  count(word, 
+        sort = TRUE)
+```
+
+
+```{r }
+## Zoom back out to consider presidents from the depression and WWII eras with a different dictionary (bing)
+pres_sent <- stops_sotu %>%
+  inner_join(get_sentiments("bing")) %>%
+  filter(year > 1929 & year < 1945) %>%
+  count(president, year, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  arrange(year)
+
+# visualize by president
+pres_sent$President <- pres_sent$president
+ggplot(pres_sent, aes(year, sentiment, fill = President)) +
+  geom_col() +
+  labs(x = "Year",
+       y = "Sentiment\n(Negative - Positive)",
+       title = "Sentiment during Depression through WWII") +
+  theme_bw()
+```
+
+
+```{r }
+### Topic models
+## Now, let's explore variance across presidents in the modern era
+# re-clean (remove stops) for modern era
+modern <- sotu_meta %>%
+  filter(year > 1955) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by = "word") %>%
+  group_by(year) %>%
+  count(word)
+
+# dtm via tidytext (not tm)
+dtm <- cast_dtm(modern, year, word, n)
+
+# fit LDA with Gibbs
+modern_lda <- LDA(dtm, k = 6, 
+                  method = "Gibbs", control = list(seed = 72458))
+
+# top 5 terms from each topic
+terms(modern_lda, 10)
+
+# which topic characterized the given year's address?
+topics(modern_lda)
+
+table(topics(modern_lda))
+```
+
+
+
+```{r }
+# visualize most frequently used terms across topics
+topics <- tidy(modern_lda, 
+               matrix = "beta")
+
+terms <- topics %>%
+  group_by(topic) %>%
+  top_n(15, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+terms %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip() +
+  theme_bw()
+
+```
+
+
+```{r }
+## Store the "gammas" for each document: the probability a speech is associated with a topic
+# Reagan's first SOTU compared to his SOTU post-reelection
+gamma <- tidy(modern_lda, 
+              matrix = "gamma")
+
+(reagan81 <- gamma %>% 
+  filter(document == "1981") %>% 
+    arrange(-gamma))
+
+(reagan85 <- gamma %>% 
+    filter(document == "1985") %>% 
+    arrange(-gamma))
+
+
+# Any differences?
+```
+
+
+
+
+
+```{r }
+## ON YOUR OWN: Exploring whether polarization has made its way into "diplomatic" SOTU addresses
+#
+# 1. Create two corpora (or dfs. Note: this will have implications for the plots in question 2): 
+#           1) polarized modern (post-Korean war), 1995-2016 
+#           2) unpolarized modern (post-Korean war), 1955-1994
+#
+# 2. Plot distributions of words for each period. Any (high-level) evidence of polarization?
+#
+# 3. Using the bing dictionary, score the sentiment of each period. Visually compare the results. Any evidence of polarization?
+
+
+#
+
+
+# SOLUTIONS:
+# 1. two corpora
+# unpolarized first
+modern_unpolarized <- stops_sotu %>%
+  filter(year > 1955 & year < 1994) %>%
+  select(year, word) %>%
+  nest(word) %>%
+  mutate(text = map(data, unlist),
+         text = map_chr(text, paste, collapse = " "))
+
+modern_unpolarized <- with(modern_unpolarized, 
+                VCorpus(VectorSource(text)))
+
+modern_unpolarized %>% 
+  tm_map(stripWhitespace) %>% 
+  tm_map(removeNumbers) %>% 
+  tm_map(removePunctuation) %>% 
+  tm_map(content_transformer(tolower))
+
+# polarized
+modern_polarized <- stops_sotu %>%
+  filter(year > 1994 & year <= 2016) %>%
+  select(year, word) %>%
+  nest(word) %>%
+  mutate(text = map(data, unlist),
+         text = map_chr(text, paste, collapse = " "))
+
+modern_polarized <- with(modern_polarized, 
+                           VCorpus(VectorSource(text)))
+
+modern_polarized %>% 
+  tm_map(stripWhitespace) %>% 
+  tm_map(removeNumbers) %>% 
+  tm_map(removePunctuation) %>% 
+  tm_map(content_transformer(tolower))
+
+# 2. 
+# modern_unpolarized word cloud of 150 most frequently used words
+set.seed(2305)
+wordcloud(modern_unpolarized,
+          max.words = 150,
+          colors = brewer.pal(10, "Dark2"),
+          random.order = FALSE, 
+          rot.per = 0.30, 
+          random.color = TRUE)
+
+# modern_polarized word cloud of 150 most frequently used words
+set.seed(2305)
+wordcloud(modern_polarized,
+          max.words = 150,
+          colors = brewer.pal(10, "Dark2"),
+          random.order = FALSE, 
+          rot.per = 0.30, 
+          random.color = TRUE)
+
+# 3. 
+# unpolarized
+pres_sent <- stops_sotu %>%
+  inner_join(get_sentiments("bing")) %>%
+  filter(year > 1955 & year < 1994) %>%
+  count(president, year, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  arrange(year)
+
+pres_sent$President <- pres_sent$president
+p1 <- ggplot(pres_sent, aes(year, sentiment, fill = President)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ President) +
+  labs(x = "Year",
+       y = "Sentiment\n(Negative - Positive)",
+       title = "Sentiment during Unpolarized Era (1955-1994)") +
+  theme_bw()
+p1
+
+# polarized
+pres_sent_pol <- stops_sotu %>%
+  inner_join(get_sentiments("bing")) %>%
+  filter(year > 1994 & year <= 2016) %>%
+  count(president, year, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>%
+  arrange(year)
+
+pres_sent_pol$President <- pres_sent_pol$president
+p2 <- ggplot(pres_sent_pol, aes(year, sentiment, fill = President)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ President) +
+  labs(x = "Year",
+       y = "Sentiment\n(Negative - Positive)",
+       title = "Sentiment during Polarized Era (1995-2016)") +
+  theme_bw()
+p2
+
+library(gridExtra)
+
+grid.arrange(p1, p2, nrow = 2)
+```
