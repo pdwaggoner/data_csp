@@ -1,0 +1,2791 @@
+---
+title: |
+  | Introduction to R Workshop
+  | 2020 Conference on Statistical Practice
+author: | 
+  | Philip Waggoner
+  | University of Chicago
+  | pdwaggoner@uchicago.edu
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+Welcome to the workshop on an intro to R at the 2020 CSP! I am happy to have you all and look forward to introducing you to a lot of what R has to offer. Though we will be covering a ton of material today, we are still only scratching the surface. There is so much beyond what we will cover. Thus, where appropriate, I have included additional resources throughout for your benefit to dive deeper if so desired. Here is a bit of the front matter before jumping in.
+
+
+
+### I have two primary goals for you all in presenting this material:
+
+1. To introduce you to R. R is at the same time a programming language as well as an environment to do statistics and data science. As R is open source (meaning open contribution of packages via the Comprehensive R Archive Network ([CRAN](https://cran.r-project.org/))), there are many powerful tools available to users in virtually any discipline or domain to accomplish virtually any statistical or data science task. 
+
+
+
+2. Also, I am interested in exposing you all to the "tidy" approach to coding, which is also referred to as the *Tidyverse*. Though we expound on this in much greater detail throughout, the Tidyverse is a collection of packages all built around consistency and making tasks in R streamlined, with the product being a clean, clear rendering of the quantity or object of interest.
+
+
+
+### Topics covered in 5 "units":
+
+1.1. _R Markdown_ (crash course): A quick, high level overview of R Markdown (`.Rmd`). 
+
+1.2. _Foundations_: Then, we will jump into the foundations of R -- objects and functions. This sets up everything that follows. Next, working directories and working with R packages, both necessary for any work with R. 
+
+1.3. _Programming_: We will cover programming concepts only to the degree necessary to interact with more of R, though this is much more in depth than we can cover in a single day. E.g., data structures of R (vectors, matrices, lists, data.frames), as well as the attributes of basic classes (character, numeric, factor). Students learn about indexing for each data structure, as well as some of their unique behaviors, user defined functions, and so on. 
+
+
+
+**Short Break: 10:00 - 10:15 am**
+
+
+
+2. _Data Management_: More than 80% of data analysis is data management. Thus, exploring how to conduct most major data management tasks, mostly using a tidy approach. This includes selecting variables, filtering data, summarizing data, conducting summaries by groups, combining commands with the pipe (`%>%`), stargazer, and so on.
+
+
+3. _Visualization_: Next, we will focus on the structure of graphics objects using the "grammar of graphics," which is at the heart of `ggplot` (hence, "gg"). Also introduce concepts like the scope of a variable through examples in graphing, mapping aesthetics, and layering plot objects. If time permits, we will cover advanced plotting too.
+
+
+
+**Lunch: 12:00 - 1:30 pm**
+
+
+
+4.1. _Exploratory Data Analysis_: One of the first steps in any data analysis is getting to know your data through exploratory data analysis (EDA). In this chapter, we begin discussion of statistical analysis in R by introducing some of the tools, especially the “skimr” package, for conducting this type of analysis. We demonstrate how to visually and numerically analyze data using R, as well as how to “skim” the data to provide powerful extensions beyond the traditional “summary()” command in base R.
+
+
+
+4.2. _Correlation and Regression Analysis_: The final substantive chapter takes the reader through an introduction to correlation and regression in R, demonstrating how R conducts some of the most common types of analysis in the social sciences. We demonstrate traditional regression, as well as a range of diagnostic tests that are based in the tidy R approach including, for example, using the `broom` package for thorough inspection of model output. We also introduce Logistic and Probit regression and offer a demonstration of how they differ from OLS regression in R. We also show the reader how to automatically create publication-quality tables of their regression models. For the purpose of brevity, these are the only statistical models we introduce, though an ever-expanding set of tutorials for other can be found on the companion website.
+
+
+
+**Short Break: 3:00 - 3:15 pm**
+
+
+
+5. Basic Natural Language Processing
+
+
+
+
+
+
+##
+##
+
+#### Acknowledgements
+
+I would like to acknowledge the following people for sharing and/or making code available: Ling Zhu, Scott Basinger, Thomas Leeper, Ben Baumer (and coauthors), and Hadley Wickham. I have drawn on resources from these people and combined them with my own approach to streamline presentation of the material in this format. Also, and most notably, my co-author Ryan Kennedy (University of Houston) has greatly contributed, as the core of this workshop is also the core of our book under contract with CRC Press. Thus, any and all feedback on content or presentation is welcome!
+ 
+ 
+ 
+#### About the Instructor
+
+Dr. Philip Waggoner is an assistant instructional professor of computational social science at the University of Chicago. He is an _American Statistical Association_ accredited Graduate Statistician (GStat), Associate Editor for computational social science at the _Journal of Open Research Software_, a Fellow of the _Royal Statistical Society_, and a member of _easystats_ (a software group that tends to an ecosystem of packages making statistics in R intuitive and easy). In addition to authoring and co-authoring numerous R packages, his work has appeared or is forthcoming in several peer-reviewed outlets including the _British Journal of Political Science_, _Statistics, Politics & Policy_, the _Journal of Open Source Software_, _Political Science Research and Methods_, among others. He is an occasional contributor to the London School of Economics APP Blog and R-Bloggers. For more information, please visit <https://pdwaggoner.github.io/>.
+
+
+
+## One More Final Note
+
+I have thoroughly explained all of the code with many examples throughout this markdown document. For our purposes today, don't try to read it all and listen to me. The focus today, rather, should be on wwalking through the code and examples together at a high level. Then, on hyour own after the workshop, save this document as a resource, and go back and read it more closely as you'd like. 
+
+
+
+
+
+##
+##
+## What is R?
+
+R is both a language and an environment where users can do statistics (i.e., "statistical computing"). This includes so much from data visualization and exploratory analysis, to complex modeling and advanced programming. Though R is wonderfully flexible, fast, and efficient, the learning curve is pretty steep, as users must learn to code, while also learning the substantive concepts as well. For example, in other programs such as Stata, to run a regression model, users simply need to type `regress y x`, and hit enter. Also in Stata, users can point and click, with little to no interface with the mechanics behind what is going on. This is both good and bad. It is good in that the learning curve is much gentler and accommodating. However, its not a great thing in that it restricts a lot of user interface with the process of coding and statistical analysis.
+
+
+
+## How do we use R?
+
+It is daunting to open up R for the first time, and see a blank screen. Thus, I highly recommend the use of R Studio, which is a user friendly integrated development environment (IDE) supporting R. In R studio you can do all kind of things, from practice writing code before running it, to writing replicable reports to maybe someday hopefully writing and releasing your own packages. All of this happens within R Studio. 
+
+
+## How do you get R and R Studio?
+
+Perhaps one of the best things about R is that it is _free_! Users simply need to go to the R-Project page, <http://www.r-project.org/>, to first download R. Then, once R is successfully installed, go to the R Studio page, <http://rstudio.com>, to download R studio onto your machine.
+
+Another option, if users don't want to download anything directly, simply use the R Studio cloud platform, <https://rstudio.cloud/> to directly interact with R anytime, anywhere.
+
+
+## Why the Tidyverse?
+
+There are several reasons to concentrate on the Tidyverse. First, it will allow us to get started with real data analysis, quickly. For those who do not start with a programming background, one of the more intimidating things about R is the introduction of programming concepts that usually comes with it. The basis of the R language was designed for Bell Lab engineers more than 50 years ago. The Tidyverse grammar was designed for data analysts from a wide range of backgrounds. The tools in the Tidyverse allow you to start getting meaningful data analysis right away. 
+
+Just as importantly, the shared design strategy of Tidyverse packages means that you will have an easier time learning how to do new things. The consistent design means that the intuitions you develop here should serve you well as you use new functions in the Tidyverse, allowing you to expand your knowledge more quickly.
+
+Second, the Tidyverse grammar is more comprehensible for people coming from other statistical packages. The use of characters like `$` or `[[ ]]` is often one of the most intimidating parts of learning R for beginners. We will learn these things but also a range of consistent and simple functions that will achieve the main tasks you wish to accomplish in data analysis.
+
+Third, the Tidyverse usually has a single method for achieving a goal. This is very useful for being able to learn quickly and to understand what is being done in any example. A simple illustration of this is creating a new variable that is our original variable times 1,000. In base R, there are at least three ways to do this.
+
+```{r eval = FALSE, echo = TRUE}
+dataset$new_variable <- dataset$old_variable * 1000
+
+dataset[["new_variable"]] <- dataset[["old_variable"]] * 1000
+
+dataset[, "new_variable"] <- dataset[, "old_variable"] * 1000
+```
+
+
+Since there is no _right_ way to do it, you will often find different preferences within the same group of scholars (and sometimes within the same code). 
+
+
+In contrast, there is only one way to create this variable in the Tidyverse:
+
+```{r eval = FALSE, echo = TRUE}
+dataset <- dataset %>%
+  mutate(new_variable = old_variable * 1000)
+```
+
+This makes it much easier to keep track of what is being done, share your code with others, and avoid frustration spending hours finding out what may have gone wrong with your analysis.
+
+Finally, the tools provided in the Tidyverse are extremely powerful. The `ggplot2` package, for example, has become the standard for most data visualization in R. 
+
+
+# A Quick Tour of R Markdown (`.Rmd`)
+
+Basically, R markdown is a document editor and generator allowing for well-formatted documents with code and output directly inserted. This document was created with R markdown. Perhaps the biggest value of R markdown is replication. The document will not compile if the inserted code has errors or is missing something, even as small as a single comma in an expression. So while often frustrating, R markdown (and any other markdown languages, e.g., yaml, or document/code editors such as Jupyter Notebooks) ensures that whatever is written in the document can be successfully run and re-run and re-run... 
+
+And you can (and should) use R markdown from *within* R Studio. To start a new `.Rmd` file, first select the icon for creating a new document in the upper left portion of the screen. Then, in the drop-down menu, select `R Markdown...`. It will populate the editor pane with a template including some basic sample code. And you're off! 
+
+Once you have finished your document and would like to format, simply select `Knit` at the top menu bar in R Studio. You can either select the type of output document (PDF, HTML, etc.) or prespecify in the metadata at the outset of the document, e.g., `output: html_document` or `output: pdf_document` or `output: word_document`, and so on.
+
+
+
+### Exploring R Markdown
+
+Though there is much more to R markdown syntax, we will cover just a few basics here.
+
+
+##### General Formatting
+First, formatting text. Though less intuitive than Microsoft Word, at least formatting in R markdown is more straightforward than formatting text in LaTeX. To italicize, either use `*` or `_` before and after the *section to be emphasized*. For bold, use `**` before and **after**. For footnotes, use `^` with the following text in brackets, like^[this]. And to strike through, use `~~` before and after the text to ~~strike through~~. 
+
+
+##### Lists
+Second, ordered and unordered lists, and block quotes. Lists are simple. For unordered, use either `*` or `-` and then a space, and then the text (if no space, it will think you mean to italicize). For ordered lists, simply write the number followed by a period and a space and then start writing. For nested lists, indent once (or twice) on the next line and use `+` followed by a space. 
+
+An unordered list:
+
+* item 1
+  + sub
+  + sub
+* item 2
+* item 3
+  + sub
+  
+And an ordered list:
+
+1. item 1
+    + sub
+        + sub sub
+    + sub
+2. item 2
+3. item 3
+    + sub
+
+
+##### Block Quotes
+You can also include block quotes within text using `>`. For example, here is a line of text that is in my document. But now we should break to emphasize a great quote:
+
+> Here is the great quote. Notice also that when you start a block quote in R markdown, the text is green
+
+
+##### Code Chunks
+Third, code chunks. R markdown allows you to directly insert (and thus evaluate) code via "code chunks", both in R as well as a variety of other programming languages into the document. To start a chunk, type ``` and then the name of the language in braces, e.g., R. First, of course, we have R,
+
+```{R echo = TRUE, eval = FALSE}
+print("Hello, World!")
+```
+
+You can also insert bash (shell/UNIX) code,
+
+```{bash echo = TRUE, eval = FALSE}
+osx:~ $ echo "Hello, world!"
+```
+
+Or Python,
+
+```{python echo = TRUE, eval = FALSE}
+print('Hello, world!') # same as R
+```
+
+Or C++, 
+
+```{Rcpp echo = TRUE, eval = FALSE}
+#include <iostream>
+using namespace std;
+int main() 
+{
+    cout << "Hello, World!";
+    return 0;
+}
+```
+
+
+And so on...
+
+
+
+##### Equations
+Finally, equations, links, and tables. In line equations are denoted by `$` like in LaTeX, as TeX is also supported by R markdown. And also like TeX, use `\` to call mathematical symbols or Greek letters.^[Here is a great resource for mathematical operators, Greek letters, etc. in R markdown: <https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html>] For example, `$\sum_{i=1}^{n} \lambda (x_i-\bar{x})$` gives you $\sum_{i=1}^{n} \lambda (x_i-x}\bar{)$. Use double `$$` to separate equations from text and center them, e.g., $$\sum_{i=1}^{n} \lambda (x_i-\bar{x})$$ 
+
+
+
+##### Links
+To link to external sites, put the linked text in brackets, `[]`, followed immediately by the url in parentheses `()`. So, e.g., `[R Studio](https://www.rstudio.com/)` produces [R Studio](https://www.rstudio.com/).
+
+
+
+##### Tables
+And for tables, simply use `-----` for rows and `|` for columns. For example, 
+
+here | is | a | table | with | seven | columns
+-----|----|----|-----|----|----|----
+and | it | also | has | three | rows | ...
+here | is | the | third | row | ...| ...
+
+
+
+
+
+##
+##
+# Foundations of R
+
+The goal of this section is to introduce you to some basic concepts that will be used throughout the day. 
+
+  * The first part will focus on philosophy and terminology of R that we will use throughout. 
+  
+  * The second part of this chapter will focus on setting up the packages and libraries you need and how to download useful additional tools. 
+  
+  * The third part will introduce some of the resources you can use to help you out as you develop your R skills.
+
+Before we start, _be sure you have R and RStudio downloaded and installed_, since we will be using both. If you need help with this process, or would like to start by having a more detailed understanding of the various parts of RStudio, you can consult with the online resources before moving on.
+
+
+
+### Scripting with R
+
+Interaction within the console is one of the key features of R. R is what computer scientists call a "scripting" language. This means that, when a command is passed to R, it is evaluated immediately. 
+
+In contrast, "compiled" languages, like C or C++, are ones where there is an intermediate step between writing the command and running the command where the code is compiled into native machine language before being run. While programs in compiled languages tend to run faster, the advantage of scripting languages is that they are usually easier to learn and allow for closer interaction in the context of data analysis. Moreover, as computers have become more powerful, the speed advantages of compiled languages (except in very intensive tasks) has tended to dissipate.^[Note that recent efforts have been made to combine the efficiency and speed of scripting and compiled languages, respectively, e.g., Julia, which interfaces between C, C++, R, Python, and others. Further, many of the functions in base R are actually written in C!]
+
+
+### Exercises On Your Own
+1. Practice interacting with the console. What happens when you type `Hello World` into the console and press Enter? What happens when you type `3492 / 12` and run it? 
+
+2. What happens when you type the following command into the command line, `round(sqrt(122.563^2, 2)`? How would you correct this?
+
+3. Open a new blank script in three ways: by going to File >> New File >> R Script, using the "Ctrl+Shift+N" keyboard shortcut, and clicking on the new script icon. In one of these scripts, type the commands from questions 1 and 2. Run them from the script file.
+
+4. What error message do you get when you type in `"two" + 2` (be sure to include the quotation marks)?
+
+5. To paste ("concatenate") together more than one string, you can use the `paste()` function. Try this. Type in `paste("Hello", "World!")`. What happens when you put in a number, like `paste("Hole in", 1, "!")`?
+
+
+
+
+## Understanding R
+
+The foundations of R are pretty simple, but are often a stumbling block for new users. Two general rules that we will often return to are:
+
+1. Everything in R is an object.
+2. Anything that does something is a function.
+
+
+
+### Objects
+
+Just like objects in the real world, objects in R have "attributes." For example, the number 1 and the string "one" are both objects in R, but they have different attributes. These attributes determine what you can do with them. 
+
+
+
+#### Assignment Operators 
+
+There are times when we will simply want the objects printed in the console, and other times when we will want to save those objects for later use. To save an object to memory in your R session, you can use assignment operators, which are either %>% `<-` or `=`. When you do this, it will appear in the Environment tab in the upper-right-hand corner of RStudio. 
+
+The `<-` and `=` are synonymous, but, by convention, most object assignment takes place using `<-`.^[The original computers used by Bell Labs in creating R had a single key that produced this assignment operator. Most users still prefer it today both for style reasons and because of some rare situations where the `=` may demonstrate unexpected behavior.] In RStudio, you can also use the keyboard shortcut "Alt + -" to create `<-` ("Option + -" in Mac OS).
+
+So, in the example that follows, the first line will simply print the results of `1 + 1` to the console. The second saves the object to memory and calls it `two`. To print this in the console, we simply run `two` in the console and it prints the object on the screen.
+
+```{r eval = FALSE, echo = TRUE}
+1 + 1
+```
+
+```{r eval = FALSE, echo = TRUE}
+two <- 1 + 1
+```
+
+R is what is called a "strongly typed" language. This means that capitalization and punctuation are important. The object `Two` is not the same as the object `two`. Getting an error returned saying that an object does not exist is often due to spelling or capitalization mistakes. Here is a quick example.
+
+```{r eval = FALSE, echo = TRUE}
+two <- 2
+Two <- 2.2
+two
+Two
+two == Two
+
+
+number <- rnorm(1000)
+number
+```
+ 
+
+
+
+### Functions
+
+Functions in R work the same way as the functions you learned about in elementary school math. They take an object, do something to it, and return another object. Functions in R are usually denoted by their use of parentheses. As we mentioned, everything that does something in R is a function, making R a "functional programming language."
+
+The `class()` function takes an object as its input and returns the name of the class of the object as a character string.
+
+The inputs into a function are called "arguments." 
+
+
+
+#### Exercises On Your Own
+
+1. Functions are usually denoted by parentheses, but you have seen symbols that do things without parentheses. Specifically mathematical operators, like `+`, `-`, `/`, and `*`. Type `?'+'` into the console. What does it tell you about these operators?
+
+2. In the previous exercises we used the `paste()` function to paste (concatenate) strings (words and symbols) together. You may have noticed that it automatically added a space between Type in `?paste()`. Reading the help, what argument sets this? What is its default? How can you eliminate the space (or add something different)?
+
+
+
+
+
+
+## Working directories
+
+One of the first obstacles new users of R often face is understanding and setting a "working directory." The working directory is the place on your computer from which you want R to work. Setting a working directory ensures that you know from where you are navigating to find files and to where the object you want to save are being placed.
+
+Whenever R is opened, a working directory is automatically assigned. To see where this is, users simply need to run the function `getwd()`, with no argument in the parentheses. 
+
+
+If you want to change this, then they simply need a slightly different command, `setwd()`, with the name of the new file path included in quotation marks in the parentheses. For example, typing the following, `setwd("/Users/username/Desktop")`, will set the working directory to be on the desktop of a Macintosh computer for user, `username`. For Windows users, the command will take the form `setwd("C:/Users/username/Desktop/")`.
+
+
+While we recommend that users become familiar with their file system and set their working directory by command, those who are less familiar with their computer's file system may also set their working directory using using an interactive browser. This can be accessed through the dropdown menu by going to Session >> Set Working Directory >> Choose Directory (or using the "Ctrl+Shift+H" keyboard shortcut). 
+
+In the examples later on, we will use the command `setwd(choose.dir())`, which also allows the user to interactively set the working directory if using Windows or Mac OSX, but we strongly recommend you become used to setting your working directory using one of the other methods, or that you start using R projects, which are explained in the next section.
+
+
+
+
+##
+##
+## Setting Up an R Project
+
+To create a project, just go to the Project menu in the upper-right-hand corner of RStudio, and select `New Project`. Once you have done this, you will be asked if you would like to create the project in a new directory or an existing directory. If you already have a folder containing your data, you might choose an existing folder. If you are starting from scratch, or simply want a new folder with which to do your work, choose a new directory. Locate the area into which you want to put your project, and, if it is a new directory, give it a name. 
+
+
+RStudio will create a new file with a `.Rproj` extension. Whenever you open this file, either by double-clicking on it or navigating to it using the Project menu, it will automatically set your working directory to the location of the `.Rproj` file. If you copy the folder to a new computer - no problem, all your code will still work. If you work with a co-author through Dropbox or another shared system - no problem, they can simply open the `.Rproj` folder and it will work. (_Note_: If using Dropbox, you may want to pause syncing while you are working on a project to avoid error messages.) 
+
+
+
+
+##
+##
+## Loading and Using Packages and Libraries
+
+Packages are a fundamental part of R. Packages contain many useful libraries of functions that you will need for your work in R. In 2017, the Comprehensive R Archive Network (CRAN) surpassed the 10,000 packages mark and it is still growing. R users worldwide find solutions to the data and analysis challenges they face, and they share these solutions on CRAN, GitHub, Zenodo, and other sites.
+
+To access packages, users must first _install_ the package, and then _load_ the library to be able to use the functions stored within the package source files. The basic function for installing any package is `install.packages("PACKAGE_NAME")`. 
+
+For example, to install all of the Tidyverse packages, users would install the `tidyverse` package (yes, that includes many packages in a package):
+
+```{r eval = FALSE, echo = TRUE}
+install.packages("tidyverse")
+```
+
+Once you have installed a package, it is on your computer and you do not need to install it again when you restart R or start a new project.
+
+
+Once you have the package installed, you need to load the library of functions into your workspace using the command `library(PACKAGE_NAME)`. Note the quotation marks in the `install.packages()` command, but the lack of quotation marks in the `library()` command. You will run up against error messages if you reverse these.
+
+
+Here is an example of how to load the `tidyverse` package, now that it is install (per the above line):
+
+```{r eval = FALSE, echo = TRUE}
+library(tidyverse)
+```
+
+
+To use a package, you will need to load it using the `library()` function every time you restart R or start a new project.^[ _Note_: alternatively, you can save libraries to your R profile, but we do not recommend doing this because your needs will likely change over time.]
+
+
+
+
+### The `tidyverse` Package
+
+Another package we will be using regularly is the `tidyverse` package. As noted above, the Tidyverse is actually a set of packages that share a common philosophy and grammar. This includes: 
+
+  * the `ggplot2` package for creating graphics, 
+  * the `tibble` package for producing a tibble data structure that has some useful properties compared to R's default `data.frames`, 
+  * the `dplyr` package that allows for quick and readable data manipulation, 
+  * the `tidyr` package to reshape your data into a "tidy" format that is useful for analysis, 
+  * the `readr` package for quickly parsing a range of "rectangular" data structures that are common in the social sciences, and 
+  * the `purr` package for functional programming that makes some repetitive tasks much simpler.
+
+
+You could install and load all of these packages individually, but since these packages are commonly used together, they have been bundled in a single `tidyverse` package to make it easier to load.
+
+
+
+While we strongly advocate the Tidyverse approach to programming and working in R, it is still useful to understand some parts of base R. While you can do just about any basic data analysis task in the Tidyverse, there may be some situations that require you to program in base R, you may see an example that uses base R, or you may encounter a package you want to use that follows base R conventions. 
+
+
+#### Exercises On Your Own
+
+1. Run `?c()`. What does this tell you about the `c()` function?
+
+2. Try installing and loading the `arm` package from Gelman and Hill's book [ gelman2006data]. Make sure you understand this process.
+
+
+
+
+
+### Where to Get Help
+
+Beyond the official documentation, there is a vibrant R users community that is very willing to help people learn and deal with new situations. As the Beatles would say, "I get by with a little help from my friends." In R, you have tens of thousands of friends willing to help you out. A good place to start is R-bloggers (https://www.r-bloggers.com/) or the "#rstats" hashtag on Twitter (https://twitter.com/hashtag/rstats?lang=en). R-bloggers compiles blog posts from a range of authors. It is a great place to find announcements about new R packages and books, available courses, tutorials for different tasks, and just about anything else you can do with R. You can subscribe to receive daily emails that are usually filled with interesting tidbits about what you can do with R.
+
+
+"Coding by search engine" is really a thing. We have heard tenured computer science faculty who have described their process using this phrase. If you want to learn how to do something new or if you get an error message, going to your preferred search engine and typing it in is usually not a bad place to start. For example, typing "regression analysis in R" into Google, will produce a number of tutorials to take you through examples. Often your searches will be more effective if you know the package you want to use. So, for example, we often use "tidyverse" or "dplyr" in our searches for data management questions. Similarly, if you get an error message and copy it into a search engine, chances are you will be directed to a site where someone has posted the question and someone else has answered it. We have almost always found that when we encounter an issue, someone else has also encountered it and has posted a solution. The largest repository of solutions posted by R users just like you is Stack Overflow (https://stackoverflow.com/).
+
+
+The main thing to remember is that _you are not alone_. If you are running into a problem, chances are that there are many others out there who have had the same problem, and, because of this, have probably put the information you need in the help files or posted a solution online. Nothing worth doing is going to be without some frustrations, but there are plenty of places to help you when you struggle.
+
+
+
+##
+##
+
+# BREAK - 5 min
+
+##
+##
+
+
+
+
+# Essential Programming
+
+We depart from the Tidyverse for a moment to introduce you to the basics of programming in (base) R, as these tools are quite valuable for more efficiently engaging with R programming both in and out of the Tidyverse. Specifically, we cover a variety of tools and syntactic choices in R to widen _and_ deepen your R toolbox, driving toward the ultimate goal of making our way up the steep R learning curve. This chapter is a bit more mechanical than applied, but is no less important for cultivating an effective understanding R.
+
+
+
+## Data Classes
+
+Before we get into the ins-and-outs of programming, the next couple of sections will look under the hood of R to discuss some of the fundamental items that make up the language. One way to think about this is that we will be looking at the small building blocks that can be used to make a much larger structure.
+
+
+We start by discussing the types of data objects R allows you to use and how they behave. There are several different classes of data and the operations you can perform on the data will differ, depending on the class. These classes are "numeric", "character", and "factor."
+
+
+Numeric data is just what it sounds like. This is data that is either made up of integers or doubles (a term used for numeric data that can have decimal places).
+
+```{r eval = FALSE, echo = TRUE}
+# Examples of numeric class
+class(1)
+class(1020)
+class(0.50)
+```
+
+
+
+Character data (sometimes called "strings") is data made up of a combination of letters, numbers, and, sometimes, symbols. Character data will be encased in quotation marks when it is printed out.
+
+```{r eval = FALSE, echo = TRUE}
+# Examples of character class
+class("this is a string")
+class("email email.com")
+class("1")
+thing <- c(1,2)
+as.character(thing)
+```
+
+
+
+Notice especially the last example. It is the number 1, so you might expect it to be numeric, but it is not because it is in parentheses. If you were to try a numeric operation, say adding it to something else, R would give you an error.
+
+```{r eval = FALSE, echo = TRUE}
+# Adding a string with a numeric
+"1" + 1
+```
+
+
+#### Exercises On Your Own
+
+1. Classify each of the following as numeric or character: 2, "two", "five", "5", 100.
+
+2. As shown above, if you try entering `"1" + 1`, you will get an error. Create two variables, one called `number_one` with a value of `1` and one called `character_one` with a value of `"1"`. How can you make `number_one + character_one` produce the correct answer -- 2?
+
+3. Create a vector of values using `numeric_vector <- runif(10)`, which gives you 10 random numbers between 0 and 1 from a uniform distribution. What happens when you use `as.character()` on this vector? What happens when you use `as.factor()`? 
+
+
+
+## Data Structures
+
+There are several main data structures used in R, some of which we have already encountered. The first, a vector, we have seen before. A vector is a one-dimensional collection of objects and can hold a set of items of any class. However, it cannot hold items of different classes. If it receives inputs from different classes, it will change these to make them a single class.
+
+> In most other programming languages, a vector is called an "array". Technically, an "array" in R is a separate data structure, which can be comprised of vectors of one or more dimensions. An array of one dimension is almost the same as a vector and an array of two dimensions is almost he same as a matrix. We will not go into depth on arrays, since they are not as commonly encountered as other data structures.
+
+
+
+```{r eval = FALSE, echo = TRUE}
+### A vector
+vector1 <- c(1,2,3,4,5) # A vector of numeric items
+vector1
+vector2 <- c("jack", "jill", "up the hill") # A vector of character items
+vector2
+```
+
+You can also find the length of a vector using the `length()` function. This can be an especially useful function if, for example, you are looking at vectors of differing lengths and want to get the last few items in them. This will be especially useful when you try to write functions that might be used on vectors of different lengths.
+
+```{r eval = FALSE, echo = TRUE}
+length(vector1)
+```
+
+
+A matrix is essentially a collection of one-dimensional vectors arranged into $m$ dimensions of rows and columns. As with a vector, a matrix can only be of one class. And, while we will not cover it here, R includes a range of operations that can be used for matrix (linear) algebra. You can access parts of a matrix by placing the numbers of the rows and columns you want into brackets, separated by commas.
+
+```{r eval = FALSE, echo = TRUE}
+matrix1 <- matrix(c(1,2,3,4,5,6,7,8,9), nrow = 3, ncol = 3)
+matrix1
+
+# For example, to access the value in the 2nd row of the 3rd column
+matrix1[2,3]
+
+##### You can also use the : to access multiple items in a matrix and all items in a row or column by leaving that part blank
+matrix1[2:3,]
+
+##### You can find the dimensions of your matrix using the dim(matrixname) command
+dim(matrix1)
+
+##### You can find the number of rows and columns using nrow() and ncol() respectively
+nrow(matrix1)
+ncol(matrix1)
+```
+
+
+A "hybrid" data type is the *dataframe.* A dataframe is a list that creates rectangular data. While it looks a lot like a matrix, it allows you to access columns by names and combine a _range of data types_. All of the individual columns will be of the same data type, but different columns can have different data types. You can also access individual columns using a `$`, much like a vector. Within each column, all of the items are of the same class.
+
+```{r eval = FALSE, echo = TRUE}
+#### Dataframes are the closest to what we think of as a dataset in Stata or SPSS
+dataframe1 <- data.frame(matrix1)
+names(dataframe1) <- c("y", "x1", "x2") # Name the variables.
+
+#### You can access different variables using the datframename$variablename notation.
+dataframe1$y
+
+#### We can also use the head() function to see the first few rows
+head(dataframe1)
+```
+
+
+The last data structure we will discuss is a relatively new one developed for the Tidyverse called a "tibble." A tibble is very similar to a dataframe, and even can be constructed using very similar commands. Tibbles have a few advantages in speed and have a nicer print option (no need to use `head()`). Because of this, tibbles are slowly becoming the standard.
+
+```{r eval = FALSE, echo = TRUE}
+### Create a tibble out of a matrix
+tibble1 <- as_tibble(dataframe1)
+
+### Print the dataset
+tibble1
+
+### Hint: you can print by wrapping the chunk in ()
+```
+
+
+
+#### Exercises On Your Own
+
+1. Using `dataframe1`, which you created above, display the first 10 rows and 10 columns. How do you do this?
+
+2. Create two vectors, `v1 <- c(1, 2, 3)` and `v2 <- c(4, 5, 6)`. What happens when you use `rbind(v1, v2)` or `cbind(v1, v2)`?
+
+
+
+
+## Operators
+
+Programming in R is built on expressions, operators, and characters. And further, when using `R` we are often concerned with accomplishing complex tasks (or even simple ones) most efficiently and quickly. This implies some degree of iterating over a series of simpler tasks. While our goal is to encourage creation of user-defined functions and loops whenever possible, at a minimum, this chapter is concerned with getting you comfortable with the general syntax that is central to programming in R.
+
+First, consider _relational_ operators. These are symbols, or "operators" that define and specify relationships between objects. And recall that R is built on "object-oriented programming", where values are stored in objects which can be manipulated and combined a variety of ways downstream. The main relational operators are:
+
+1. `<`: less than
+2. `>`: greater than
+3. `<=`: less than or equal to
+4. `>=`: greater than or equal to
+5. `==`: equal (identical) to
+6. `!=`: not equal to
+
+Relational operators return an object of class "logical", meaning it has a value of either `TRUE` or `FALSE`. Put in terms of an example, the first line of the code block below asks R whether 5 is greater than 4. R returns `TRUE`. The second line asks if 5 is less than or equal to 4. R returns `FALSE`. The third line shows that the result is of class "logical."
+
+```{r eval = FALSE, echo = TRUE}
+5 > 4
+5 <= 4
+class(5 > 4)
+```
+
+
+Similar to relational operators are _logical_ operators. These are provide the ground rules for combining and pairing objects in a variety of flavors. Consider the most common logical operators:
+
+1. `!`: not  
+2. `&`: and
+3. `|`: or
+
+Note that the `!` operator appears in both lists of operators. This is because, on its own, it just means not, which is a logical expression. but combined with other operators, it can add its value, so to speak, to others (e.g., not equal to = `!=`).
+
+
+These logical operators can be used to produce complex conditions. 
+
+
+  For example, the first line of the code block below tests whether 5 is greater than 3 AND whether 5 is greater than 6. This returns a value of `FALSE` because one of the two conditions is false. The second line tests whether five is greater than 3 OR whether 5 is greater than 6. This evaluates to `TRUE` because one of the two conditions is true. The third line uses the `!` operator to reverse the second line. This evaluates to `FALSE`, reversing the result of the second line. 
+
+```{r eval = FALSE, echo = TRUE}
+5 > 3 & 5 > 6
+5 > 3 | 5 > 6
+!(5 > 3 | 5 > 6)
+```
+
+The last line of the above block also shows an important point about the use of `()` with logical operators. Just like mathematical equations, the statement inside the parentheses is evaluated first, followed by the statement outside the parentheses.
+
+
+
+
+## Conditional Logic
+
+`if` and `if else` are essential building blocks to programming in R, from testing certain values or expressions, to writing packages and big chunks of code with conditional statements, for example. They are very powerful tools in programming, and similar versions exist in all major programming languages. Specifically, the syntax starts with `if`, and then a value to be tested is supplied in parentheses, followed by braces, which include the statement to be expressed. In `if else` cases, the user can evaluate a statement under different constraints (e.g., "If value X is Y, then do Z. Otherwise ("else"), do A."). Let's begin with a simple case: evaluating whether a supplied number is positive or not.
+
+```{r eval = FALSE, echo = TRUE}
+x <- 5
+
+if(x > 0){
+  print("Positive number")
+}
+```
+
+Next, let's take a simple case for `if else`.
+
+```{r eval = FALSE, echo = TRUE}
+x <- -5
+
+if(x > 0){
+  print("Positive number")
+} else {
+  print("Negative number")
+}
+```
+
+Note, we are creating and defining object `x`, which is the value being evaluated. We can redefine `x`, and test it again.
+
+```{r eval = FALSE, echo = TRUE}
+x <- 5
+
+if(x > 0){
+  print("Positive")
+} else {
+  print("Negative")
+}
+```
+
+Though seemingly simple, `if` and `if else` are core to understanding and applying programming in R.
+
+
+
+##
+##
+## User-Defined Functions
+
+Building on (and soon to layer) the logic of conditional statements using `if` and `if else`, we now shift to user-defined functions. These are similarly powerful programming tools that drastically streamline the programming (and research) process. They allow users to do a ton of stuff like automating rote, redundant code and calculations. But the value of functions is mostly that they allow for consistent calculation and for simple usage in future applications. They operate on the same principle of preferring `sum(2,2,2,2)` in base R to the more laborious `(2 + 2 + 2 + 2)`. Though the tradeoff may seem minimal with the simple example, the value of writing functions to streamline code and calculations will quickly become apparent. 
+
+As with before, let's begin with a simple example to get the intuition: squaring a value. Rather than typing: `(3^2) # run`, `(4^2) # run`, `(5^2) # run`, and so on, a function would streamline this process significantly, prevent the likelihood of messing up the syntax if approached line by line, and also allow the user to come back to access the function in the future (as well as update for needed complexity as we will see below). The syntax is defining a new object, and then specifying the function with an argument supplied in parentheses. Then, within braces, there is a statement to be evaluated, and the result is returned as output. With that, let's make this squared value a function.
+
+```{r eval = FALSE, echo = TRUE}
+sq <- function(x) {
+  sqn <- x^2
+  return(sqn)
+}
+```
+
+With the function defined by the user (hence the name), we can call the function to see if it worked properly. 
+
+```{r eval = FALSE, echo = TRUE}
+sq(10)
+```
+
+This is good news! Our function worked as expected. Feel free to try squaring any value to verify (or have fun). 
+
+
+
+Now, let's complicate our example just a little bit, but allowing for greater flexibility. In the following case, we are updating the function to allow for x and y values this time. Thus, instead of just squaring our supplied value, we are now allowing for raising any value to any power. As such, we change the name of the original function from `sq` to `exp`.
+
+```{r eval = FALSE, echo = TRUE}
+exp <- function(x, y) {
+  expn <- x^y
+  return(expn)
+}
+```
+
+With the function defined, we can now call it to see if it worked. For a simple case, raise 2 to the power of 4.
+
+```{r eval = FALSE, echo = TRUE}
+exp(2,2)
+```
+
+Now, here is another complication, but allowing for a much more descriptive (and thus useful) function. In the next case, we are printing a descriptive output using both `print` and `paste`, the latter of which allows us to "paste" words along with our output, which is especially useful when writing R packages. 
+
+```{r eval = FALSE, echo = TRUE}
+exp <- function(x, y) {
+  expn <- x^y
+  print(paste(x,"raised to the power of", y, "is", expn))
+  return(expn) # optional 
+}
+
+
+
+exp(2,3)
+```
+
+
+And further, we can also assign "default values" in our functions, which are values you don't have to specify, but could change if you want. These default values also make the default value optional. Note, we are continuing to redefine our `exp` function from earlier. If you wanted to leave the original intact, you would simply need to change the object name to the left of the assignment operator, `<-`.
+
+```{r eval = FALSE, echo = TRUE}
+exp <- function(x, y = 2) {
+  expn <- x^y
+  print(paste(x,"raised to the power of", y, "is", expn))
+}
+```
+
+From here, we can call a few versions of the function to see everything come together:
+
+```{r eval = FALSE, echo = TRUE}
+exp(3)
+```
+
+Or...
+
+```{r eval = FALSE, echo = TRUE}
+exp(3, 1)
+```
+
+
+
+Now, let's build on what we have learned so far and create a new function that actually does something of value. Specifically, we can write a function that calculates temperature in Celsius, given a supplied Fahrenheit value. 
+
+```{r eval = FALSE, echo = TRUE}
+celsius <- function(f) {
+  c <- ((f - 32) * 5) / 9
+  return(c)
+}
+```
+
+
+With the function defined, we can either supply individual Fahrenheit values, or a vector of Fahrenheit values; the function can handle both. Let's store a vector of Fahrenheit values in the object `fahrenheit` and test out the function (**note**: if we supply a vector of values, we should get a vector of values returned as output).
+
+
+```{r eval = FALSE, echo = TRUE}
+fahrenheit <- c(60, 65, 70, 75, 80, 85, 90, 95, 100) 
+
+celsius(fahrenheit)
+```
+
+Excellent! The function worked as expected with quick calculation of a vector of Fahrenheit values to Celsius via our `celsius` user-defined function.
+
+
+
+
+### Layering Statements
+
+Learning each part, it is important to note that the power of these programming building blocks is that they can be layered. Notably, we can embed conditional logic previously discussed (`if` and `if else`) into user-defined functions to make them even more powerful, descriptive, and ultimately more useful. 
+
+```{r eval = FALSE, echo = TRUE}
+
+# First, write the function
+pnz <- function(x) {
+  if (x > 0) {
+    n <- "Positive"
+  }
+  else if (x < 0) {
+    n <- "Negative"
+  }
+  else {
+    n <- "Zero"
+  }
+  return(n)
+}
+
+# Now call it for a variety of values
+pnz(4)
+pnz(-3)
+pnz(0)
+
+```
+
+Note that in the combination above, we combined `if` and `else` to have an `else if` statement, which is a programmatic way of layering multiple statements in a single function. 
+
+
+
+
+
+Finally, de-bugging is a key piece of writing code in R, especially when creating R packages. Specifically, we can tell a function to `stop` if something in the code is wrong/missing, or we can also print `warning` messages if something is where it shouldn't be, but we don't want to stop the function entirely and throw an error message. 
+
+Let's put all of these pieces together that we have learned so far and replicate a function to calculate the Herfindahl-Hirschman Index, which is a measure of concentration (often used as a proxy for competition). This is from one of my R packages, `hhi`, and serves as a useful case study applying all of this logic.
+
+```{r eval = FALSE, echo = TRUE}
+
+#' Calculate Herfindahl-Hirschman Index Scores
+#' 
+#'@usage hhi(x, "s")
+#'@param x Name of the data frame
+#'@param s Name of the vector (variable) from the data frame, x, corresponding with market share values
+#'@return hhi A measure of market concentration
+#'@note The vector of "share" values == total share of individual firms (e.g., df$s <- c(35, 40, 5, 4)
+#'@note 0 is perfect competitiveness and 10,000 is a perfect monopoly
+
+
+hhi <- function(x, s){
+  if(!is.data.frame(x)) {
+    stop('"x" must be data frame\n',
+         'You have provided an object of class: ', class(x)[1])
+  }
+  shares <- try(sum(x[ ,s]))
+  if(shares < 100 | shares > 100) warning('shares, "s", do not sum to 100')
+  d <- x[ ,s]
+  if(!is.numeric(d)) {
+    stop('"s" must be numeric vector\n',
+         'You have provided an object of class: ', class(d)[1])
+  }
+  if (any(d < 0)) {
+    stop('vector "s" must contain only positive values')
+  }
+  hhi <- sum(d^2)
+  
+  return(hhi)
+}
+```
+
+With the function defined, as well as parameters defined, we can create some fake "firm" data as well as the share of the market each retains, and then calculate the competitiveness (or concentration) of this hypothetical market.
+
+```{r eval = FALSE, echo = TRUE}
+a <- c(1,2,3,4) # firm id
+b <- c(20,30,40,10) # market share of each firm (totaling 100%)
+x <- data.frame(a,b) # create data frame
+
+hhi(x, "b")
+```
+
+
+
+
+##
+##
+## Loops
+
+Let's transition to `for` loops, which are a close relative of user-defined functions. Indeed, these are often used together, and can even be used to do similar things, with a few tweaks. We will see this in a moment. But let's start at the beginning. `for` loops allow for iterating some calculation or function over a bunch of different observations. So instead of typing out the same calculation line by line, while updating the main quantity of interest, you can just tell a `for` loop to do it *for* you (**pun not intended, but not regretted**). 
+
+The syntax for `for` loops is similar to functions, where they begin with "for" and then start with some value in a sequence in parentheses. Then, within the braces, there is similarly a statement to be evaluated. Let's see how this works in practice by revisiting our temperature example.
+
+```{r eval = FALSE, echo = TRUE}
+fahrenheit <- c(60, 65, 70, 75, 80, 85, 90, 95, 100) 
+
+for (i in 1:length(fahrenheit)) { 
+  print(((fahrenheit[i] - 32) * 5) / 9)
+}
+```
+
+The same logic applies here, where we tell the loop to start at the first value (1) for each observation, `i`, in the vector of values in the object `fahrenheit`. And calculate the temperature conversion for each value in the `fahrenheit` vector. Finally, print the results for each supplied value. In sum, `for` loops are quite powerful tools that will significantly streamline your programming and make you think more efficiently in the process (e.g., "Rather than calculating values incrementally, how could I automate the process based on foundational logic/rules?"). 
+
+#### Exercises On Your Own
+
+1. Write a function to calculate body mass index (BMI) and store it in object, `bmi`. *Note*: the formula is $bmi = \frac{wt}{h^2}$, where $wt$ is a person's weight (kilograms), and $h^2$ is a person's height squared (meters).
+
+2. Repeat #1, but using a `for` loop instead.
+
+3. Pass the following vectors, `weight` and `height`, to your function (from #1) and your loop (#2): `weight <- c(70, 75, 80, 60, 90)` and `height <- c(1.3, 2, 2.1, 1, 1.7)`. Do you see the same values returned? Why or why not? 
+```{r}
+# here is the solution to 3, as we didn't cover "seq_along()"
+
+# create vectors for raw values
+weight <- c(70, 75, 80, 60, 90)
+height <- c(1.3, 2, 2.1, 1, 1.7)
+
+# create mpty numeric vector to store computed values
+bmi <- numeric(length(weight))
+
+# loop across each obs, of length "weight" (just to keep things organized)
+for (i in seq_along(weight)) {
+  bmi[i] <- (weight[i] / (height[i]^2))
+}
+
+# call computed values
+bmi
+```
+
+
+
+
+##
+##
+
+# 15 minute break
+
+##
+##
+
+
+
+# Data Management
+
+It is not unusual for data scientists to talk about how 80% of their job is getting the data into the format they want. Here we will walk through the basics of managing ("munging") your data, from loading the data into R to exporting the data to other programs and reporting the information about your data. We will cover all of these tasks using the Tidyverse, along with a few useful utilities in base R. 
+
+## Loading Our Data
+
+Load the ANES 2016 pilot data using a new command, `file.choose()`.
+
+```{R eval=FALSE, echo=TRUE}
+library(tidyverse)
+
+# Load the NES data using read_csv() 
+NESdta <- read_csv(file.choose())
+```
+
+While CSV files are quite common, sometimes you will find data in a variety of other formats. For example, if we had a dataset that had been saved using SAS (.sas7bdat), SPSS (.sav), or Stata (.dta) -- three popular statistical programs -- you can use the `haven` package.
+
+```{r eval = FALSE, echo = TRUE}
+# Load the additional library needed for this task.
+library(haven)
+library(here)
+
+# Load the NES data using the read_dta() and here() functions for reading a Stata file
+NESdata <- read_dta(here("data", "anes_pilot_2016.dta"))
+
+# Load the NES data using the read_sav() and here() functions for reading a SPSS file
+NESdata <- read_sav(here("data", "anes_pilot_2016.sav"))
+
+# Load the NES data using the read_sas() and here() functions for reading a SAS file
+NESdata <- read_sas(here("data", "anes_pilot_2016.sas7bdat"))
+```
+
+As we have already noted, one of the real powers of R is the ability for users to write their own solutions to address problems that are often encountered by researchers. In a number of other software programs, it can be quite difficult to read certain types of data unless you have access to that specific program. An (in)famous example of this occurred in 2013, when Stata changed its data format, making it to where anyone using older versions of the program could not open files saved by the new version of Stata. Anyone with older versions of the program found their system was rendered functionally illiterate overnight. R can handle all of these data types (plus many more) because its global user base has made it relatively easy to do so.
+
+R also has the capacity to open files from database programs, like SQL, or from online APIs that usually report results in JSON format. We will not cover all of these here, but it is worthwhile to note that just about any kind of data structure can be handled by R with the use of packages.
+
+
+### The American National Election Survey (ANES)
+
+Today, we will mostly be using the American National Election Survey (ANES) for demo purposes The ANES project is one of the longest running in political science in the U.S. While it was formally created by the U.S. National Science Foundation (NSF) in 1977, the University of Michigan had been conducting surveys around midterm and presidential elections going back to 1952. The rich results from these surveys have been the raw material for countless books, dissertations, and published articles.
+
+We specifically look at the 2016 pilot study, which was collected between January 22 and January 28, 2016. 1,200 individuals were interviewed in a 32 minute online questionnaire. The survey included questions covering a range of topics among U.S. eligible voters: preferences in the presidential primary, stereotyping, the economy, discrimination, race and racial consciousness, police use of force, and numerous policy issues.
+
+
+
+## Munging
+
+Now that we have data loaded, we need to start doing things with it. Data "munging" or "wrangling" is the process of getting your data into the form you need for analysis (i.e., data management). The Tidyverse offers a myriad of functions for effectively, efficiently and consistently managing data. Most of these functions are in the `dplyr` package, which is one of the main components of the Tidyverse. We will cover six of these functions:
+
+* `select()` - choose specific variables you wish to keep
+* `filter()` - filter your data by selected values
+* `group_by() `- group your data by categorical values
+* `summarise()` - create summary statistics of data
+* `mutate()` - create new variables
+
+As with almost any dataset, the NES data has many more variables than we could ever really plan on using in a single analysis. So, we might want to limit ourselves to just those in which we have some interest. Let us create a new object, called `NESdta_short`, which includes only the variables we will need for this section.
+
+```{r eval = FALSE, echo = TRUE}
+# Select particular variables
+NESdta_short <- NESdta %>% 
+  dplyr::select(fttrump, pid3, birthyr, gender, ftobama, state, pid7)
+
+NESdta_short
+```
+
+This creates a new tibble that only includes five variables: `fttrump` - a "feeling thermometer" where people rate their feelings of then primary candidate Donald Trump from 0 to 100; `pid3` - a three point rating of political identity, where 1 means Democrat, 2 means Independent, and 3 means Republican; the respondent's `year` of birth, which we will use to establish their age; the respondent's `gender`, which is 1 if male and 2 if female; and the feeling thermometer for then-President Barack Obama (`ftobama`), again from 0 to 100.
+
+The `select()` function in the Tidyverse is very versatile. It can be combined with other functions like `starts_with()`, `ends_with()`, and `contains()` to select more than one variable at a time. We can also use the `:` to select more than one variable that are consecutive in the dataset.
+
+For example, if we wanted to select all of the feeling thermometer variables, and we know that they all start with the prefix `ft`, we could simply put the following.
+
+```{r eval = FALSE, echo = TRUE}
+# Select using starts_with()
+NESdta %>% 
+  dplyr::select(starts_with("ft"))
+```
+
+Alternatively, since they are next to each other in the original dataset, we could have done it like this.
+
+```{r eval = FALSE, echo = TRUE}
+# Selecting using a range
+NESdta %>% 
+  dplyr::select(ftobama:ftsci)
+```
+
+We can also combine all of these tools. Let's say we wanted political party affiliation, year of birth, gender, and all of the feeling thermometer variables (with the prefix `ft*`). 
+
+```{r eval = FALSE, echo = TRUE}
+# Combining selection procedures
+NESdta %>%
+  dplyr::select(pid3, birthyr, gender, starts_with("ft"))
+```
+
+Finally, we can also use the `select()` function to remove columns by placing `-` in front of them. For example, say we decide that we do not want to keep the 7 point political ID scale. We can remove it from the dataset with the following command.
+
+```{r eval = FALSE, echo = TRUE}
+NESdta_short <- NESdta_short %>%
+  dplyr::select(-pid7)
+
+NESdta_short
+```
+
+
+
+
+
+The `filter()` function works similar to the `select()` function, but instead of selecting columns by their _names_, `filter()` allows you to select rows by their _values._ 
+
+If, for example, we wanted to find only the respondents who gave Donald Trump the highest possible rating, we could do this easily using this function. In this case, there were 54 people in the survey who matched this criterion.
+
+```{r eval = FALSE, echo = TRUE}
+# Select only those respondents who give Trump a 100
+NESdta_short %>%
+  dplyr::filter(fttrump == 100)
+```
+
+Let's say that we only want to see those respondents who give Donald Trump the highest possible rating (100) and Barack Obama the lowest possible rating (1). We can combine these conditions using the `&` ("and") operator.
+
+```{r eval = FALSE, echo = TRUE}
+# Select only those respondents who give Trump a 100 and Obama a 1
+NESdta_short %>%
+  dplyr::filter(fttrump == 100 & ftobama == 1)
+```
+
+We could also look for those who either give Donald Trump the highest possible rating or give Barack Obama the highest possible rating by using the `|` ("or") operator. There are 144 respondents who match one of these two criterion.
+
+```{r eval = FALSE, echo = TRUE}
+# Select only those respondents who give Trump a 100 or give Obama a 100
+NESdta_short %>%
+  dplyr::filter(fttrump == 100 | ftobama == 100)
+```
+
+
+
+We can also combine these logical operators. 
+
+Let's say that we want all the people who have either given both Donald Trump and Barack Obama scores of 100 or have given them both scores of 1. We can do this using parentheses, just like we would in a mathematical equation. This tells R to first find all the people who match the first criterion, then find all the people who match the second criterion, and select the people who match either one criterion or the other. Perhaps unsurprisingly, there are only four people who match one of these two criteria.
+
+```{r eval = FALSE, echo = TRUE}
+# Select only those respondents who both Trump and Obama 100s or 1s.
+NESdta_short %>%
+  dplyr::filter((fttrump == 100 & ftobama == 100) | (fttrump == 1 & ftobama == 1))
+```
+
+Finally, we can also filter using ranges and other mathematical operators. If, for example, we wanted only those people whose approval of Donald Trump is greater than 50, we can do this much as you would expect.
+
+```{r eval = FALSE, echo = TRUE}
+# Select only those respondents who give Trump an approval rating greater than 50
+NESdta_short %>%
+  dplyr::filter(fttrump > 50)
+```
+
+This also applies to finding values that are related to the summary statistics for the full data. For example, if we wanted all of those who give a higher than average approval of Donald Trump, we could run the following.
+
+```{r eval = FALSE, echo = TRUE}
+NESdta_short %>%
+  dplyr::filter(fttrump > mean(fttrump, na.rm = TRUE))
+```
+
+
+#### Exercises On Your Own
+
+1. Using the `NESdta` tibble, create a new tibble called `NESdta_practice` that only includes `pid3` and `fttrump`.
+
+2. Using the `NESdta` tibble, create a new tibble that overwrites `NESdta_practice` that only includes variables containing the string `pid`.
+
+3. Filter the rows to only those respondents who give Donald Trump a higher approval than the median.
+
+
+
+
+## Grouping and Summarizing Your Data (and Using "the Pipe")
+
+You may have noticed the strange symbol in a few of the previous commands, `%>%`. This is called a "pipe," which is read as "then," and it was originally developed by Stefan Milton Bache for the R package `magrittr`. The pipe allows you to declare at the very beginning the data on which you want to work and stack a number of operations onto that data without having to declare the data you want to use each time you issue a command (or, worse, only work with one dataset at a time - yes, people really do this).
+
+To show you how the pipe allows you to stack commands, let's look at two other functions - the `group_by()` and `summarise()` functions. Let's say that we think that Republicans will be most positively disposed to Donald Trump as a candidate, followed by Independents, and then by Democrats - not an earth-shaking hypothesis, but it works for demonstration. We can use the `group_by()` function to tell R what groups we want to make, and follow this with the `summarise()` command to create the needed summaries.
+
+```{R eval=FALSE, echo=TRUE}
+# Using group_by() and summarise()
+NESdta_short %>%
+  group_by(pid3) %>%
+  summarise(average_fttrump = mean(fttrump, na.rm = TRUE),
+         median_fttrump = median(fttrump, na.rm = TRUE),
+         variance_fttrump = var(fttrump, na.rm = TRUE),
+         stddev_fttrump = sd(fttrump, na.rm = TRUE),
+         max_fttrump = max(fttrump, na.rm = TRUE),
+         min_fttrump = min(fttrump, na.rm = TRUE),
+         n_fttrump = n()) %>%
+  ungroup()
+```
+
+As you can see from the output, the `group_by(pid3)` function has declared that we want R to group respondents together by their party affiliation. The `summarise(average_fttrump = mean(fttrump, na.rm = TRUE), ...)` command is a little more complex. We are telling R that we are going to have it create a new variable, `average_fttrump`, that is the mean value of the variable for each group. 
+
+The `mean()` function is a part of the base R system. The command `na.rm = TRUE` is necessary to tell R that we do not want it to include any missing values - "NA". Why is this needed? Well, technically the average of anything including a missing value is going to be missing. So we need to tell R explicitly that we do not want them to be included. The other functions - e.g. `max()`, `min()`, `median()` - work in a similar manner. Finally, since we are done with these groups, we run the `ungroup()` function. This ensures that the grouping does not persist past these commands.
+
+Another useful function, but from base R, is the `summary()` function. This function takes an object as its input and outputs an adaptive display of summary statistics.
+
+```{R eval=FALSE, echo=TRUE}
+# Using the summary() function with a dataset
+summary(NESdta_short)
+```
+
+
+
+Similarly, we can use the `summary()` function on single variables using the `$`, where the dataset is placed before the `$` and the variable of interest is placed after, as shown below.
+
+```{R eval=FALSE, echo=TRUE}
+# Using the summary function with a variable
+summary(NESdta_short$fttrump)
+```
+
+
+
+Finally, we can create the groups for any number of conditions. Extending our first example, let's say we want the mean approval of Donald Trump broken down by party affiliation and gender. This can be accomplished by just including both conditions, separated by a comma.
+
+```{r eval = FALSE, echo = TRUE}
+# Summarising mean approval of Trump by party and gender
+NESdta_short %>%
+  group_by(pid3, gender) %>%
+  summarise(average_fttrump = mean(fttrump, na.rm = TRUE),
+            n_fttrump = n()) %>%
+  ungroup()
+```
+
+
+#### Exercises On Your Own
+
+1. Using the `summary()` function, give the summary statistics for `ftobama`.
+
+2. Sometimes it is more useful to find out how many respondents fall within a category. Using the base R `table()` function find out how many people are in each category of the `pid3` variable.
+
+3. How would you do what you did in #2 using `group_by()` and `summarise()`?
+
+4. Using `group_by()` and `summarise()` find the summary statistics for `ftobama` by `gender`.
+
+5. When combining commands, we use the `%>%` (pipe). Try to put in your own words what it means to pipe data from one command to another. Go back through the last example, what is being piped into each command? How is the data changed at each step?
+
+
+
+
+## Creating New Variables
+
+Another task that you will often find yourself doing is adding new variables to your dataset. This is usually done with the `mutate()` function from the `dplyr` package in the Tidyverse. Let's start with a very simple variable transformation. The `birthyr` variable does not directly represent the concept we really want, age. To do this, we should create a new variable that calculates the age of a respondent by subtracting their birth year from the year of the survey.
+
+```{r eval = FALSE, echo = TRUE}
+# Create a new variable giving the respondent's age
+NESdta_short <- NESdta_short %>%
+  mutate(age = 2016 - birthyr)
+
+NESdta_short
+```
+
+This works for any number of different operations on variables. For example, if we wanted to get the square of the respondent's age, we could simply do the following.
+
+```{r eval = FALSE, echo = TRUE}
+# Create a new variable giving the square of respondent's age
+NESdta_short <- NESdta_short %>%
+  mutate(age2 = age^2)
+
+NESdta_short
+```
+
+And, if we wanted to get rid of that same variable later, we could do that by setting its value to NULL.
+
+```{r eval = FALSE, echo = TRUE}
+# Remove variable with square of age from dataset
+NESdta_short <- NESdta_short %>%
+  mutate(age2 = NULL)
+
+NESdta_short
+```
+
+
+
+In the last section, we summarized support for then-candidate Donald Trump by party affiliation. But what if we want these summaries to be a part of the `NESdta_short` dataset? This is where the `mutate()` function comes in. Run the same functions as above, but this time let us use the `mutate()` function instead of the `summarise()` function.
+
+```{R eval=FALSE, echo=TRUE}
+# Creating a new variable using group_by() and mutate()
+NESdta_short <- NESdta_short %>%
+  group_by(pid3) %>%
+  mutate(average_fttrump = mean(fttrump, na.rm = TRUE)) %>%
+  ungroup()
+
+NESdta_short
+```
+
+As you can see, a sixth column has been added to our dataset, with the average values for each political ID added to the dataset. From here, we can take other actions. For example, we can subtract the average for each group from the individual respondent's evaluation of candidate Donald Trump by using the `mutate()` function again.
+
+```{R eval=FALSE, echo=TRUE}
+# Using mutate to create a new variable
+NESdta_short <- NESdta_short %>%
+  mutate(deviation_fttrump = fttrump - average_fttrump)
+NESdta_short
+```
+
+A new column has been added showing how far away each respondent is from the average for those who share their party affiliation. Respondent 1, shown in the first row, gives Donald Trump a rating about 21 points lower than the average for those who share their party affiliation.
+
+
+
+*Note* that while the feeling thermometers for Donald Trump and Barack Obama are only supposed to go from 0 to 100, the summary statistics said the maximum values were 998. What is happening here?
+
+Many datasets try not to leave blank spaces or mix strings and numeric values. The reason is that some programs might behave unexpectedly when loading this data. So, instead, they represent missing values by highly improbable numeric values -- in this case 998 (other datasets will use unexpected negative values like -999). 
+
+  > We need to tell R that these are actually missing values, denoted as `NA` in R, as opposed to actual numbers.
+
+To do this, we can again use the `mutate()` function. This time, we combine it with the `replace()` function. `replace()` takes three values as its input. The first is the variable on which we are making the replacement, the second is a logical test. This can be read as, "Where the variable is..." For example, the second part of the first replacement asks it to make the replacement where the variable `fttrump` is greater than 100. As you can see, within the `mutate()` function, we have asked for our original variable to be equal to the specified replacement (i.e., we have _redefined_ the original variable to drop these nonsensical values).
+
+```{R eval=FALSE, echo=TRUE}
+# Using replace() to recode values
+NESdta_short <- NESdta_short %>%
+  mutate(fttrump = replace(fttrump, fttrump > 100, NA),
+         ftobama = replace(ftobama, ftobama == 998, NA))
+summary(NESdta_short)
+```
+
+
+
+
+Another variable we will likely want to change is the `state` variable. Right now, it has numbers that represent the states, but we will probably want strings with the state names as well. We can look up the numbers associated with each state in the ANES and create a new variable called `state_name` that contains the name of the state.
+
+There are a lot of values we will need to replace, so we will use a different function, the `case_when()` function, which allows us to change a large number of values within a variable.
+
+```{R eval=FALSE, echo=TRUE}
+# Create a new variable called state_name with the string names of states
+NESdta_short <- NESdta_short %>%
+  mutate(state_name = case_when(state == 1~"Alabama", state == 2~"Alaska",
+                                state == 4~"Arizona", state == 5~"Arkansas",
+                                state == 6~"California", state == 8~"Colorado",
+                                state == 9~"Connecticut", state == 10~"Delaware", 
+                                state == 11~"District of Columbia",
+                                state == 12~"Florida", state == 13~"Georgia",
+                                state == 15~"Hawaii", state == 16~"Idaho",
+                                state == 17~"Illinois", state == 18~"Indiana",
+                                state == 19~"Iowa", state == 20~"Kansas",
+                                state == 21~"Kentucky", state == 22~"Louisiana", 
+                                state == 23~"Maine", state == 24~"Maryland",
+                                state == 25~"Massachusetts", state == 26~"Michigan", 
+                                state == 27~"Minnesota", state == 28~"Mississippi",
+                                state == 29~"Missouri", state == 30~"Montana",
+                                state == 31~"Nebraska", state == 32~"Nevada",
+                                state == 33~"New Hampshire", state == 34~"New Jersey",
+                                state == 35~"New Mexico", state == 36~"New York",
+                                state == 37~"North Carolina", state == 38~"North Dakota",
+                                state == 39~"Ohio", state == 40~"Oklahoma",
+                                state == 41~"Oregon",  state == 42~"Pennsylvania",
+                                state == 44~"Rhode Island",  state == 45~"South Carolina",
+                                state == 46~"South Dakota", state == 47~"Tennessee", 
+                                state == 48~"Texas", state == 49~"Utah", 
+                                state == 50~"Vermont", state == 51~"Virginia",
+                                state == 53~"Washington", state == 54~"West Virginia",
+                                state == 55~"Wisconsin", state == 56~"Wyoming"))
+
+NESdta_short
+```
+
+A final note: you might have noticed the double equal sign, `==`. This is a relatively common logical operator used in many statistical packages. A single equal sign, `=`, is used to set one object equal to another. So, in the command above, when we type `fttrump = ...`, this tells R to change the object `fttrump` into what follows the equal sign. A double equal sign, `==`, is used for comparison, and it returns a value of `TRUE` if the item on the left-hand side is equal to the item on the right-hand side, and `FALSE` otherwise.
+
+You will use this a lot, especially as we start discussing the use of logic. A type of logical command you will find yourself using a lot is `ifelse(condition, outcome if true, outcome if false)`. 
+
+
+
+Let's take, for example, the `gender` variable in the ANES data. Here, we are interested in recoding the gender variable (currently 2 = female and 1 = male) to be more descriptive and also on the more common 0,1 scale. Using `mutate()` and `ifelse()` from base R, we create a new variable `female`, where 1 equals cases when `gender` = 2 (female), and 0 otherwise (previously, `gender` = 1).
+
+```{R eval=FALSE, echo=TRUE}
+# Gender is currently coded 1 for male 2 for female. We need a dummy variable.
+unique(NESdta_short$gender)
+# Use ifelse() to create a dummy variable for if respondent is female
+NESdta_short <- NESdta_short %>%
+  mutate(female = ifelse(gender == 2, 1, 0))
+NESdta_short
+```
+
+
+#### Exercises On Your Own
+
+1. Create a new variable called Republican that is 1 if the respondent is a Republican (`pid3` == 2) and 0 otherwise.
+
+2. Create a new variable called `pid_text` that gives the text labels for `pid3` (1 = Democrat, 2 = Republican, 3 = Independent, 4 = Other).
+
+3. Create a new variable that is the de-meaned version of `ftobama`. Try to do it in one step using `%>%`.
+
+4. Use `replace()` to change those who are labeled "Independent" in your `pid_text` variable to "Other."
+
+
+
+## Saving Your Dataset for Later Use
+
+After all the work you have done to get your data into the shape you want, you will probably want to save this dataset to your hard drive so you do not have to start over in your next session. To do this, we recommend using the `write_csv()` function from the `readr` package in Tidyverse. 
+
+There are several reasons we recommend saving your data. First, we suggest saving data as a `.csv` file because text-based storage files like this are quite compact, can be opened by a range of programs and languages, and will not become obsolete in the future. Older users of Stata or SPSS can attest that using proprietary storage can results in loss of data once the program manager decides to update the software and not maintain backward compatibility. Second, much like the difference between `read_csv()` from `readr` and base R's `read.csv()` function, the Tidyverse version has some defaults that users are likely to prefer. For example, the base R command (`read.csv()`) adds row names to the dataset by default with no variable name. We have yet to encounter a situation in which this adds value to the dataset and can sometimes cause problems, especially on datasets that are repeatedly opened and modified.
+
+Saving your dataset is relatively simple. You simply add two arguments to the `write_csv()` function. The first is the tibble or `data.frame` you wish to save. The second is where you want it saved, including the file name you wish to use. Here we are going to save our `NESdta_short` tibble as a `.csv` file called `ANES_short.csv` in our data folder.
+
+```{r eval = FALSE, echo = TRUE}
+# Save the NESdta_short tibble as a .csv file
+write_csv(NESdta_short, here("data", "ANES_short.csv"))
+```
+
+As you might expect, there are "write" versions of all of the "read" commands used earlier for opening our data. This makes R very flexible for opening and converting a wide variety of data sources.
+
+
+
+## Saving Your Dataset Details for Presentation
+
+Once you have all the data you need for your analysis in the format that you want, it is time to save that information in a format that you can use to present it in a paper or book. We have all been in the situation where we have put in a ton of work putting together a dataset and a reviewer catches a small error or suggests the addition of a new variable. At one point in time, we would have manually typed in all the numbers and formatting, requiring that even some relatively minor changes resulted in hours of extra work. As you might already suspect, when there are problems like these, R users have likely written a package for dealing with the issue.
+
+The `stargazer` package was designed so that you can easily take your analyses and turn them into professional tables that can be inserted into a word processing document (e.g. Word, LibreOffice, \LaTeX). It will take care of formatting, updating, and most of the other tasks with little work on your part. Not only that, but `stargazer` is extremely flexible -- able to accommodate a wide range of table formats, custom standard errors, and other quirks you may encounter in particular journals or with particular reviewers. 
+
+Here we will show how `stargazer` produces a table of summary statistics that can be inserted into a Microsoft Word document. Later, we will show how to generate a table for regression models. 
+
+We will start by making sure we have an object that only includes the columns we wish to summarize. In this case, let's just pick 3 variables: `fttrump`, `age`, and whether the respondent is `female`. We will create the age variable by subtracting the year of the survey the respondent's year of birth from the year of the survey, 2016. We will create a dummy variable indicating whether the respondent is female using the same `ifelse()` statement we used above. The we will use `select()` to pick just those three columns.
+
+```{r eval = FALSE, echo = TRUE}
+# Create and select variable to be summarized
+NESdta_summary <- NESdta_short %>%
+  mutate(age = 2016 - birthyr,
+         female = ifelse(gender == 2, 1, 0),
+         fttrump = replace(fttrump, fttrump > 100, NA)) %>%
+  dplyr::select(fttrump, age, female)
+```
+
+Now that we have the dataset to be summarized, we can load the `stargazer` library and run the `stargazer()` function on the dataset. Note that we need to convert our tibble to a `data.frame` for stargazer.
+
+```{r eval = FALSE, echo = TRUE}
+# Load stargazer package into workspace 
+library(stargazer)
+
+# Create LaTeX-style table to print to console
+stargazer(data.frame(NESdta_summary))
+```
+
+For those of you not familiar with \LaTeX, the output might look a little strange. \LaTeX\ is a document preparation system to produce high-quality typesetting. It is commonly used by academics because of its ability to automate some parts of the writing process (e.g. creating a formatted bibliography). It can also be used to automatically update tables and figures from R. It also, however, has a somewhat steep learning curve, so we will not assume you use it here.
+
+Instead, let's create an HTML table. These can be opened natively in Microsoft Word and simply copied and pasted into any document. To do this, we will set the type of chart to HTML, along with some other details.
+
+```{r eval = FALSE, echo = TRUE}
+# Add informative variable labels
+stargazer(data.frame(NESdta_summary),
+          type = "html",
+          covariate.labels = c("Approval of Trump",
+                               "Age",
+                               "Female"),
+          out = "test.html")
+```
+
+`stargazer` is very flexible and rich, with many options for customizing your tables. And once you have written the code for your table once, all you need to do in order to update it is make a small modification and re-run the code. If you would like to know more about the types of table `stargazer` can make and how to vary different features, check out the online documentation (https://www.jakeruss.com/cheatsheets/stargazer/).
+
+
+
+
+
+##
+##
+# Visualization
+
+Let's walk through some basic and advanced visual techniques in both base R and the Tidyverse, still using the ANES dataset. To make sure its clean, we can reload it (no need to do this if you don't want to). 
+
+```{r eval = FALSE, echo = TRUE}
+library(tidyverse)
+
+# Load the NES data
+NESdta <- read_csv(file.choose())
+```
+
+And let's do some simple data manipulation to get our variables into the format we would like.
+
+```{r eval = FALSE, echo = TRUE}
+# Modify variables into the format we would like
+NESdta_short <- NESdta %>%
+  dplyr::select(fttrump, ftobama, birthyr, race, faminc, pid3, gender) %>% 
+    mutate(fttrump = replace(fttrump, fttrump > 100, NA),
+           ftobama = replace(ftobama, ftobama > 100, NA),
+           age = 2016 - birthyr,
+           white = ifelse(race == 1, 1, 0),
+           faminc = replace(faminc, faminc > 90, NA),
+           republican = ifelse(pid3 == 2, 1, 0),
+           party = case_when(pid3 == 1 ~ "Democrat",
+                             pid3 == 2 ~ "Republican",
+                             pid3 > 2 ~ "Other"),
+           gender = case_when(gender == 1 ~ "Male",
+                              gender == 2 ~ "Female"))
+
+```
+
+## Histograms
+
+Let's start by making a simple historgram to show the density of support for then-candidate Donald Trump early in the 2016 primary season. If we were doing this using base R, the commands might look something like this.
+
+```{r eval = FALSE, echo = TRUE}
+# Create the histogram
+hist(NESdta_short$fttrump, 
+     xlab = "Feeling Thermometer for Trump", 
+     ylab = "Number of Respondents", 
+     main = "Histogram of Approval for Trump")
+
+```
+
+There is nothing particularly wrong with this approach to plotting the histogram, but using the base R plotting functions can quickly produce ugly code that is difficult to remember and understand. Let's say, for example, we want to see separate histograms for the density of support for Trump by political ID: "Republican", "Democrat", and "Independent". Here is what this might look like using R's standard plots.
+
+```{r eval = FALSE, echo = TRUE}
+# First, subset the data by political affiliation for individual histograms
+Republican <- subset(NESdta_short, party == "Republican")
+Democrat <- subset(NESdta_short, party == "Democrat")
+Independent <- subset(NESdta_short, party == "Other")
+
+# Next, generate the histograms using the `hist` command
+par(mfrow = c(2, 2)) # places all histograms in a single 2x2 plot pane
+hist(Republican$fttrump, xlab = "Feeling Thermometer for Trump", ylab = "Number of Respondents", main = "Republicans")
+hist(Democrat$fttrump, xlab = "Feeling Thermometer for Trump", ylab = "Number of Respondents", main = "Democrats")
+hist(Independent$fttrump, xlab = "Feeling Thermometer for Trump", ylab = "Number of Respondents", main = "Other")
+par(mfrow = c(1, 1)) # reset plot space
+```
+
+There are a number of reasons this code is "less than pretty". Notice that there is no overall "grammar" to how we construct the plots. We find ourselves using `$` and functions like `par()` that do not seem to fit with the tasks in which we have the most interest. The names we are using for the tasks also do not match easily with what we are trying to do. For example, `mfrow` is a vector of length 2 that specifies the number of rows and columns. But trying to remember what this command is and what it does is difficult to remember, meaning that you will probably have to look it up next time you want to do it. There is also the issue of setting the global options. Notice that we have to use the `par()` function twice. The second time is to make sure we do not accidentally create a plot with 2 rows and 2 columns when we do not want to do so. It would be far better if we could revert to this default without having to explicitly do so every time. Finally, notice that there is no overall title for the figure. This is because this is viewed as three separate figures pasted together. 
+
+The package `ggplot2`, included in the `tidyverse`, is designed to be a "grammar of graphics," in a similar way to how `dplyr` was designed as a "grammar of data manipulation." It has a set of commands that are consistent across different types of plots. It also, as we will see, allows you to make complex plots without a lot of extra work.
+
+
+
+Let's make do the same thing we did above, but using `ggplot2`. Start by creating a simple histogram.
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(data = NESdta_short) +
+  geom_histogram(aes(x = fttrump), binwidth = 10) +
+  labs(x = "Feeling Thermometer for Trump",
+       y = "Number of Respondents",
+       title = "Histogram of Approval for Trump") +
+  theme_bw()
+```
+
+You will immediately see a few differences in this way of writing the code. First, you will see that we are combining different part of the plot using a "+". Just like the "%>%" we used for data manipulation, this lets us add different parts to the chart as we go. We can start with a very simply plot and add on to it to create something more complex that looks the way we want it.
+
+One thing that you will see sometimes is a warning saying something like, "Removed 3 rows containing non-finite values (stat_bin)". This is simply telling you that there were three cases in which the variable `fttrump` was missing data. This is another advantage to `ggplot2`, it tells you more about your data then the base R functions. 
+
+
+
+To see how this creates cleaner code, it is useful to show a more complex example. Let's try breaking down the histograms by political ID again leveraging `ggplot2`.
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(data = NESdta_short) + # Declare a ggplot object and give it the data.
+  geom_histogram(aes(x = fttrump), binwidth = 10) + # Use the histogramp geom, set the aesthetic (aes), tell it the variable you want to use, and set the thickness of the bins (update as desired)
+  theme_bw() + # Use the black-and-white theme.
+  facet_wrap( ~ party, scales = "free", ncol = 2) + # Compiles the histograms by political ID.
+  labs(x="Felling Thermometer of Trump", # axis/plot labels
+       y="Number of Respondents",
+       title = "Approval of Trump by Political ID")
+```
+
+In this example, we simply added another function using the `+`, called `facet_wrap`, which tells the system to compile subgraphs as a function of the political party of the respondent.
+
+
+
+#### Exercises On Your Own
+
+1. Create a histogram for the feeling thermometer for then-President Obama. Modify the number of bins until it looks like what you want.
+
+2. Using `facet_wrap()`, break down support for President Obama by political party. Be sure to set the `binwidth` and make the labels accurate.
+
+3. `ggplot2` includes many different themes that can fit your personal preferences. Try changing `theme_bw()`. Re-create the final plot for `fttrump` from the text above, and try out `theme_classic()` and `theme_dark()` to see what some of these look like.
+
+
+## Bar Plots
+
+Another very common plot for better understanding the distribution of your data is the bar plot. Let's say you wanted to plot the number of respondents with different political IDs in your data. Since this is a categorical variable, a histogram does not make a lot of sense.
+
+Here is how you would need to create a bar plot in base R. 
+
+```{r eval = FALSE, echo = TRUE}
+# A bar plot in base R
+# First, create a table and save it as an object
+pid_table <- table(NESdta_short$party)
+
+# Create a bar chart of the table
+barplot(pid_table, xlab = "Political ID", ylab = "Number of Respondents", main = "Distribution of Part ID")
+```
+
+Now let's create the same graph using `ggplot2` with the `geom_bar()` function. Notice how this does not introduce any more concepts or steps from the process for creating a histogram.
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(data = NESdta_short) +
+  geom_bar(aes(x = party)) +
+  labs(x = "Political ID",
+       y = "Number of Respondents",
+       title = "Distribution of Party ID") +
+  theme_bw()
+```
+
+We can also combine the skills we learned for data management earlier to create more complex plots. Let's say we want to know the average approval of Trump by party. This is pretty easy to do by combining the `summarize()` function with our graphing functions. We can even use the pipe, `%>%`, to link them together.
+
+The only new thing that we need to do is change the `stat` argument in the `geom_bar()` function to "identity". This tells the program to use the variable we define for the y-axis as the height of the bars, rather than counting the number of cases.
+
+```{r eval = FALSE, echo = TRUE}
+NESdta_short %>%
+  group_by(party) %>%
+  summarize(mean_approval = mean(fttrump, na.rm = TRUE)) %>%
+  ggplot() +
+  geom_bar(aes(x = party, y = mean_approval), stat = "identity") +
+  labs(x = "Political Party",
+       y = "Mean Feeling Thermometer for Trump",
+       title = "Approval for Trump by Party") +
+  theme_bw()
+```
+
+
+
+## Scatterplots
+
+Another very common plot choice is the scatterplot. This can be useful for a variety of tasks, from viewing simple distributions of variables to displaying relationships and predicted probabilities. As with histograms, there are less-than-pretty ways of creating these, and thus there are decidedly prettier ways as well. We start with the base `R` version using the `plot` command.
+
+```{r eval = FALSE, echo = TRUE}
+plot(NESdta_short$age, NESdta_short$fttrump,
+     main = "Relationship Between Age and Support for Trump",
+     xlab = "Age",
+     ylab = "Feeling Thermometer for Trump",
+     pch = 19,
+     cex = 0.5,
+     col = "red")
+```
+
+Let's start with a simple `ggplot2` scatter plot with the command `ggplot`, before progressing to some more descriptive and advanced plots below.
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(NESdta_short, aes(x = age, y = fttrump)) +
+  geom_point() + # generate a scatterplot (instead of a line or bar plot, for example)
+  geom_smooth(method = lm) + # linear smoother
+  labs(x = "Age", y = "Feeling Thermometer for Trump",
+       title = "Relationship Between Age and Approval of Trump") +
+  theme_bw()
+
+```
+
+This is already a much prettier plot that is also more descriptive. There are two things that we have changed from our previous plots. First, we declared our aesthetic in the `ggplot()` function, rather than in our geometry functions. Since we are using the same aesthetic for both geometries, we can declare it earlier and not have to repeat it. This is a concept that computer scientists call the "scope" of a variable. When we declare it in the `ggplot()` function, the values for the aesthetic, `aes()`, are the same for all subsequent functions and are communicated to those functions by the `+` operator. When we declare the aesthetic in the individual geometries, for example in `geom_point()`, it only applies to that geometry. This is very useful if we want to overlay charts using different variables, or even different datasets.
+
+We also have declared two geometries, `geom_point()` and `geom_smooth()`. The first creates our scatter plot and the second creates our regression line, showing the positive relationship, as well as the 95% confidence intervals.The `method = lm` argument is used to specify that we are using a linear model to create the line (the default if we do not specify a method is a non-linear LOESS model).
+
+
+
+We can do a lot with these building blocks. Let's say that we think that age *interacts* with partisan ID. We can check this by adding to the aesthetic of our plot, telling it to fill the plot components with colors representing the values of partisan ID.
+
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(NESdta_short, aes(x = age, y = fttrump, fill = party)) +
+  geom_point() + # generate a scatterplot (instead of a line or bar plot, for example)
+  geom_smooth(method = lm) + # linear smoother
+  labs(x = "Age", y = "Feeling Thermometer for Trump",
+       title = "Relationship Between Age and Approval of Trump", fill = "Partisan ID") +
+  theme_bw()
+```
+
+Note the different colors associated with the respondent's partisan ID ("Republican", "Democrat", "Other".) Now both the points and the linear fit lines have been colored according to the respondent's partisan ID, showing the relationship between age and approval of Trump, conditional on partisanship.
+
+There are many more arguments and updates users can make to `ggplot2` plots. For example, users can also use the `shape` argument to change the shape of the points (e.g., circles, triangles, etc.). Just run `?ggplot2` to view the many parameters and customization options available.
+
+Since there are a large number of points, it can be difficult to see where the largest concentration of respondents are in a scatter plot, so we will also set "alpha = 0.3", which increases the transparency of points, making darker sections indicative of higher concentrations (we could also use the `geom_jitter()` function to add a small amount of noise that can make individual points more visible).
+
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(NESdta_short, aes(x = age, y = fttrump)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = lm) + 
+  theme_bw() +
+  labs(x = "Age", 
+       y = "Feeling Thermometer for Trump",
+       title = "Approval of Trump by Age and Partisanship") +
+  facet_wrap(~ party, ncol = 2) # change the number of rows or columns using "nrow = x" or "ncol = x", respectively
+```
+
+
+
+## Combining Multiple Plots
+
+In some instances, you might want to combine multiple plots of different types. While the `facet_wrap` function allows you to combine plots of the same type broken down by a grouping variable, it would not let you combine plots of different kinds or with different data. To do this, we will use the `gridExtra` package.
+
+In this example, we will create four plots, a histogram of `fttrump`, a bar graph for `party`, a histogram for `age`, and a scatter plot for age and approval for Trump. We will then paste them together using the `grid.arrange()` function.
+
+```{r eval = FALSE, echo = TRUE}
+library(gridExtra)
+
+plot1 <- ggplot(NESdta_short) +
+  geom_histogram(aes(x = fttrump), binwidth = 10)
+
+plot2 <- ggplot(NESdta_short) +
+  geom_bar(aes(x = party))
+
+plot3 <- ggplot(NESdta_short) +
+  geom_histogram(aes(x = age), binwidth = 10)
+
+plot4 <- ggplot(NESdta_short) +
+  geom_point(aes(x = age, y = fttrump))
+
+grid.arrange(plot1, plot2, plot3, plot4, ncol = 2)
+```
+
+
+
+#### Exercises
+
+1. Create four plots from this data. Place them into a grid.
+
+2. What happens if you do not set the number of columns in the `grid.arrange()` function?
+
+3. Save your grid plot as on object called `g1` using `<-`.
+
+4. You can also create grids that combine multiple grids. Try `grid.arrange(g1, g1)`. What happens? What about `grid.arrange(g1, plot1)`?
+
+
+
+##
+##
+## Advanced Visualization
+
+Scatterplot via `plotly`. 
+
+```{R eval = FALSE, echo=TRUE}
+library(plotly)
+
+# simple scatterplot
+scatter <- plot_ly(NESdta_short, # data object
+        x = ~ age, # x axis
+        y = ~ fttrump, # y axis
+        type = "scatter", # plot type (e.g., "bar", "pie", "histogram", etc.)
+        text = paste("Party: ", NESdta_short$party), # change hover text
+        mode = "markers", # plotting object type (e.g., "lines", "markers"/points)
+        color = ~ party, # conditional color by party
+        colors = c("blue", "green", "red"),
+        size = ~ age # conditional size by age
+        ) %>% 
+  layout(title = 'Simple Scatterplot',
+         xaxis = list(title = 'Age'),
+         yaxis = list(title = 'Approval of Trump'))
+scatter
+```
+
+Histogram via `plotly`.
+
+```{R eval = FALSE, echo=TRUE}
+hist <- plot_ly(NESdta_short, # data
+                   x = ~ fttrump, # x axis
+                   type = "histogram", # plot type
+                   text = paste("Party: ", NESdta_short$party), # change hover text
+                   color = ~ party, # conditional color by party
+                   colors = c("blue", "green", "red")
+) %>% 
+  layout(title = 'Simple Histogram',
+         xaxis = list(title = 'Feeling Thermometer for Trump'),
+         yaxis = list(title = 'Number of Respondents'))
+hist
+```
+
+Useless 3-D for fun.
+
+```{R eval = FALSE, echo=TRUE}
+m <- matrix(sample.int(400, 
+                       size = 85*60, 
+                       replace = TRUE), 
+            nrow = 85,
+            ncol = 60)
+
+m.plot <- plot_ly(z = m, 
+                  type = "surface")
+m.plot
+```
+
+Geospatial Choropleths.
+
+```{R eval = FALSE, echo=TRUE}
+library(sf)
+library(tidyverse) 
+library(ggmap) # Google Maps API Terms of Service: http://developers.google.com/maps/terms (see citation("ggmap") for details)
+
+# Loading up the geographic data
+## quick helper function for cd boundaries
+
+get_congress_map <- function(cong=114) {
+  tmp_file <- tempfile()
+  tmp_dir  <- tempdir()
+  zp <- sprintf("http://cdmaps.polisci.ucla.edu/shp/districts%03i.zip",cong)
+  download.file(zp, tmp_file)
+  unzip(zipfile = tmp_file, exdir = tmp_dir)
+  fpath <- paste(tmp_dir, sprintf("districtShapes/districts%03i.shp",cong), sep = "/")
+  st_read(fpath)
+}
+
+# Then for our example, we load the districts from the 114th congress:
+
+cd114 <- get_congress_map(114)
+
+## Select just the districts from New Jersey
+
+cd114_nj <- cd114 %>% 
+  filter(STATENAME=="New Jersey") %>%
+  mutate(DISTRICT = as.character(DISTRICT)) %>%
+  select(DISTRICT)
+
+## Add in new district-level data
+
+trump_nj <- tibble(DISTRICT=as.character(1:12),
+                   `Trump Vote`=c(36.1, 50.6, 51.4, 55.8, 
+                                  48.8, 40.6, 47.5, 21.5,
+                                  33.1, 12.8, 48.8, 31.8))
+cd114_nj <- cd114_nj %>% 
+  left_join(trump_nj, by="DISTRICT")
+cd114_nj
+
+# map NJ with CD's and vote shares for Trump
+ggplot() + 
+  geom_sf(data = cd114_nj, aes(fill = `Trump Vote`), inherit.aes=FALSE, alpha=0.9) + 
+  scale_fill_gradient(low = "blue", high = "red", limits=c(10,60)) +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) 
+
+
+#
+## Or, we can look at a map overlayed on a google map
+## Before mapping, we need to (obtain and) set a google maps API key -- mine is expired, but here is the code in case you're interested, follow this code:
+
+register_google(key = "[YOUR API KEY HERE]", write = TRUE) # first register
+
+dm <- get_map(location = "New Jersey", # store the map from Google maps
+              zoom = 8)
+
+## Source : https://maps.googleapis.com/maps/api/staticmap?center=New+Jersey&zoom=8&size=640x640&scale=2&maptype=terrain&language=en-EN
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=New%20Jersey
+
+ggmap(dm) + 
+  geom_sf(data=cd114_nj,aes(fill=`Trump Vote`),inherit.aes=FALSE,alpha=0.9) + 
+  scale_fill_gradient(low = "blue", high = "red", limits=c(20,80)) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) 
+```
+
+Animated plots.
+
+```{R eval = FALSE, echo=TRUE}
+library(gganimate)
+library(gifski)
+library(png)
+
+## E.g., we can celebrate the 4th of July with fireworks
+#
+
+# set "American" colors
+colors <- c(
+  'white',
+  'red',
+  'blue'
+)
+
+# function for a single explosion
+explosion <- function(n, radius, x0, y0, time) {
+  u <- runif(n, -1, 1)
+  rho <- runif(n, 0, 2*pi)
+  x <- radius * sqrt(1 - u^2) * cos(rho) + x0
+  y <- radius * sqrt(1 - u^2) * sin(rho) + y0
+  id <- sample(.Machine$integer.max, n + 1)
+  data.frame(
+    x = c(x0, rep(x0, n), x0, x),
+    y = c(0, rep(y0, n), y0, y),
+    id = rep(id, 2),
+    time = c((time - y0) * runif(1), rep(time, n), time, time + radius + rnorm(n)),
+    color = c('white', rep(sample(colors, 1), n), 'white', rep(sample(colors, 1), n)),
+    stringsAsFactors = FALSE
+  )
+}
+
+# create your dataset using the explosion function (defining each point)
+n <- round(rnorm(100, 40, 4))
+radius <- round(n + sqrt(n))
+x0 <- runif(20, -30, 30)
+y0 <- runif(20, 40, 80)
+time <- runif(20, max = 100)
+july4 <- Map(explosion, 
+             n = n, 
+             radius = radius, 
+             x0 = x0, 
+             y0 = y0, 
+             time = time)
+july4 <- dplyr::bind_rows(july4)
+
+# Happy 4th!
+ggplot(july4) + 
+  geom_point(aes(x, y, 
+                 color = color, 
+                 group = id), 
+             size = 0.5, shape = 20) + 
+  scale_color_identity() + 
+  theme_void() + 
+  theme(plot.background = element_rect(fill = 'black', 
+                                       color = NA),
+        panel.border = element_blank()) + 
+  transition_components(time, exit_length = 20) + # allowing for transitions to be slow (default is 0)
+  ease_aes(x = 'circular-out', y = 'circular-out') + # defines how each explosion progresses to the other
+  shadow_wake(0.05, size = 3, wrap = FALSE, # controls entrance and "fall off"
+              exclude_phase = 'enter') + # phases that should not get a shadow -- here "entering phases"
+  exit_recolor(color = 'black') # disappears back into the night (black)
+```
+
+Polar plots.
+
+```{R eval = FALSE, echo=TRUE}
+# Manipulate the mtcars data and create some useful indicators for plotting
+mtcars <- mtcars
+mtcars$id <- seq(1, nrow(mtcars))
+mtcars_labs <- mtcars
+bar_num <- nrow(mtcars_labs)
+angle <- 90 - 360 * (mtcars_labs$id - 0.5) / bar_num 
+mtcars_labs$hjust <- ifelse(angle < -90, 1, 0)
+mtcars_labs$angle <- ifelse(angle < -90, angle + 180, angle)
+
+# Now generate the plot using the ggplot command in the ggplot2 package
+ggplot(mtcars, aes(x = as.factor(id), y = mpg)) + 
+  geom_bar(stat = "identity", fill = alpha("darkblue", 0.3)) +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank(),
+        panel.grid = element_blank()) +
+  coord_polar(start = 0) + # this makes it a polar plot (circle)
+  geom_text(data = mtcars_labs, aes(x = id, y = mpg + 5, label = rownames(mtcars), hjust = hjust), 
+            color="black", 
+            fontface="bold",
+            alpha=0.5, 
+            size=2.5, 
+            angle = mtcars_labs$angle, 
+            inherit.aes = FALSE) +
+  labs(title = "Fancy Polar Barplot",
+       x = "",
+       y = "") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+
+
+
+##
+##
+
+# Lunch break: 12:00 - 1:30 pm
+
+##
+##
+
+
+
+
+
+# Exploratory Data Analysis
+
+The first thing any researcher should do prior to fitting models is get to know the data. This is the case because often the shape and structure of the data is unknown to the researcher. For example, if the data are skewed in a certain direction along some variable of interest, then this could limit the quality of inferences drawn after fitting a model (we will discuss this more below). But beyond overtly harmful effects, it is a good idea to know some basic features of the data as well as distributional shapes and patterns. 
+
+Here we will focus on some common methods for exploring data including: plots (barplots, boxplots, and scatterplots), summary statistics (inter-quartile range (IQR), mean, median, minima and maxima, and so on), and a combination of these methods in tidy framework using the `skimr` package.
+
+```{r eval = FALSE, echo = TRUE}
+# Load the libraries needed for this chapter
+library(tidyverse)
+library(skimr)
+
+# Load the ANES data again if needed and quick munging
+NESdta_sub <- NESdta %>%
+  dplyr::select(fttrump, pid3, birthyr, gender, ftobama) %>%
+  mutate(fttrump = replace(fttrump, fttrump > 100, NA),
+         ftobama = replace(ftobama, ftobama == 998, NA),
+         Party = dplyr::recode(pid3, 
+                        `1` = "Democrat", 
+                        `2` = "Republican", 
+                        `3` = "Independent")) %>%
+  as.data.frame() %>%
+  drop_na()
+```
+
+## Visual Exploration
+
+With the data loaded and tidied, an additional great EDA visual tool not previously discussed in the visualization section is the boxplot (`geom_boxplot`). 
+
+Boxplots are highly descriptive summaries of data of any size, showing the IQR, from the 1st quartile to the 3rd, in the box, with the line in the box representing the median of the distribution. The "whiskers" on the bottom and top of the plot show the minimum and maximum, respectively, of the data distribution. The dots represent outliers. 
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(NESdta_sub, aes(x=Party, y=fttrump)) +
+  geom_boxplot() +
+  labs(x = "Political Party",
+       y = "Trump Feeling Thermometer Score",
+       title = "Feeling Thermometer for Trump by Party Affiliation",
+       subtitle = "2016 ANES Pilot Study") +
+  theme_bw()
+```
+
+## Numeric Exploration
+
+While visual exploration is a vastly important first step to take prior to fitting models, it is not the only exploratory tool at our disposal. Numeric summaries and descriptions of data are also quite useful for unpackaing and exploring data efficiently. Base R has many useful tools for this, including `summary()`. We will start here, but bring in the tidy approach quickly, which allows for more efficient front-end filtering and wrangling as we saw in the earlier "Data Management" chapter. Consider first some basic summary statistics calculated using the `summary()` command in base R.
+
+```{r eval = FALSE, echo = TRUE}
+summary(NESdta_sub)
+```
+
+The output from this object includes variable-level numeric summaries consisting of: minimum value, 1st quartile, median, 3rd quartile, mean, and maximum (as well as a count of missing values (NAs), if those exist in the data). When calling the summary on the full data set, the output produced these basic summary statistics for _all_ variables in the data set, which here was our tidied `NESdta_sub` data object. However, we urge caution in such a use of `summary()`, as some values may not make sense. For example, R will calculate the mean value of a categorical dummy variable, which takes on only values of 0 and 1. Even though a ``mean'' is calculated, this has no substantive meaning. 
+
+Though a useful starting place, the tidy approach to numeric exploration of data is much more efficient and cleanly output. Though there are many tools in the tidyverse that we could use, we will focus on: `sample_n`, `filter`, `group_by`, and `skim` (from the `skimr` package, which is written to complement the tidy approach, as we will see in a moment).
+
+If we were interested in only grabbing a subset of rows/observations from the full data set, but wanted it to be a random grab to get a "fair" (or perhaps, _fairer_) look at the data, the `sample_n` function from the Tidyverse is a good place to start. It has a number of useful arguments, such as allowing the user to specify how many random observations to grab (`size`) as well as whether to sample with or without replacement (`replace`). Consider the following example, inspecting a random sample with replacement of observations of length 10 across all variables in our `NESdta_sub` data object.
+
+```{r eval = FALSE, echo = TRUE}
+sample_n(NESdta_sub, 
+         size = 10, 
+         replace = TRUE)
+```
+
+We get a cleanly formatted tibble of 10 ranadomly selected observations/respondents across all variables in our `NESdta_sub` object.^[We encourage users to adjust and alter the arguments in the function to observe how the random grab change each time the function is called, e.g., changing `size` from 10 to 30, or setting `replace = TRUE`. Or at a minimum, consider testing the randomness claim here by simply running the previous code chunk again (and again) seeing how the sampled rows differ each time.]
+
+In line with the tidy approach to programming, we can layer several functions using the pipe operator (`%>%`) we previously discussed in the "Data Management" chapter, as well as at the outset of this chapter when tidying and creating our restricted data object, `NESdta_sub`. For example, we may want to explore a random set of observations that appear in the data after a specific date. In this case, we would pipe the `filter` function to restrict our small sample of length 5 to include respondents younger than the median birth year, which is 1967.^[Note the `na.rm` argument, which in this case is set to `TRUE`. This simply means that we would like to filter values at the supplied threshold for all observations containing real values, not those with missing values.] Building on the discussion of the `filter()` function in the earlier "Data Management" chapter, it is useful to point out that there are other versions of `filter()`, which allow for conditional filtering of data, or filtering based on specific values of a given variable, e.g., `filter_if()` or `filter_at()`. These can be extremely useful in numerically exploring specific chunks of the data, or data based on some condition of interest as in our example here. We encourage users to inspect the `dplyr` package documentation for many more details on the wide array of options available in the `filter` family, let alone the full range of munging functions in the `dplyr` package. To do so, run the command `?filter` with a single `?` for the specific function, or `??dplyr` with two `??` to inspect documentation for the entire package.
+
+```{r eval = FALSE, echo = TRUE}
+median(NESdta_sub$birthyr) # 1967
+
+NESdta_sub %>%
+  filter(birthyr > median(birthyr, na.rm = TRUE)) %>%
+  sample_n(5, replace = TRUE)
+```
+
+Similarly, we could group observations along a specific attribute by piping another layer using the `group_by()` function, and then drawing a random sample of 5 from each party, again, for all respondents younger than the median age in the sample.
+
+```{r eval = FALSE, echo = TRUE}
+NESdta_sub %>%
+  filter(birthyr > median(birthyr, na.rm = TRUE)) %>%
+  group_by(pid3) %>%
+  sample_n(5, replace = TRUE)
+```
+
+Importantly, in all of these exercise of exploring the data as well as those discussed in the "Data Management" chapter, respondents can store these restricted datasets as object, as with any value in R. Recall, as we noted in the Foundations chapter, that R is built around the notion of "object-oriented programming", where manipulation and stored of values in objects is at the very core of using and working with R. And recall that objects are created by simply passing one value to another through the assignment oeprator, `<-`. 
+
+As an aside, the intuition and consistency of the Tidyverse should hopefully be apparent by this point. To reiterate, the aim of tidy programming is to make programming in R as simple, concise, clear, and consistent as possible. For example, in many of the Tidyverse packages, you will see a lot of similarities in the names of arguments and functions, e.g., `_all` and `_by`. These suffixes appear in many places and mean exactly what they imply: "apply this function _by_ (based on) a given value" or "do this thing for _all_ values in the variable or for _all_ variables in the data set. The result is these tools are useful for both EDA as well as streamlining programming and workflows for more productive analysis in R.
+
+## Skimming Data
+
+Beyond addressing isolated powerful Tidyverse tools that can be used for exploratory data analysis prior to fitting models, we can combine these visual and numeric tidy functions for an even cleaner and simpler look at the data. To do so, we will rely on the `skim()` function from the `skimr` package. 
+
+The `skim()` function can be used for summary statistics for individual variables or entire datasets. Though more informative and useful than the `summary()` function in base R for a variety of reasons, one of the most powerful extensions of `skim()` is the separation of variables in a dataset by variable type (e.g., factor, numeric, character, etc.). Upon distinguishing between variable type, `skim()` presents summary statistics by variable that make sense (e.g., bypassing the meaningless "mean" calculation for dummy variables mentioned above), in addition to a visual of the distribution of each variable in the data. Consider the following exercise of skimming the variables in our restricted `NESdta_sub` data object.
+
+```{r eval = FALSE, echo = TRUE}
+skim(NESdta_sub)
+```
+
+In addition to the many useful summary statistics by variable type as well as the histogram of the variable's distribution, the standard deviations for all numeric variables is included, but not for categorical or character variables, as this calculation would not make any sense. Further, the complete and missing values are quite useful in contexts where little is known about the data or when the data are particularly large and messy. Regarding different syntax, instead of `minimum`, `median`, and so on in the `summary()` function, `skim()` calls the quantiles `p0`, `p25`, `p50`, etc. The values remain the same, despite the different terminology. 
+
+Inspecting our data set, a few things stand out. First, we have no missing observations. Also, inspecting the histogram for `birthyr`, for example, we see that it is skewed toward the younger end, where we have far fewer older respondents than young respondents.
+
+Though already significantly more informative, we can go farther in skimming our data given that, as previously mentioned, `skimr` was designed to fully integrate with tidy programming, seen, for example, in the reliance on tidy vocabulary.^[To further illustrate this point, users can even specify tidyverse commands with a `skim` call, e.g., `skim(ANES, starts_with("ft"))`, which would display the summary statistics and histograms for all feeling thermometers in the ANES dataset (i.e., beginning with "ft" prefix).] We may be interested in skimming our data by `birthyr` descending, which gives summaries at many descriptive levels, starting with the youngest (1997).
+
+
+
+#### Exercises On Your Own
+
+1. Use the `skim` function to numerically explore *all* feeling thermometers in the `NESdta` data set. (*hint*: think back to the Data Munging section on selecting subsets of variables that start with a common string, like, e.g., "ft" for feeling thermometer). 
+
+2. Plot a random sample of the Obama feeling thermometer ratings (`ftobama`) of `size = 50`, conditional on gender. Overlay a loess smoother. What do you see? What does the loess smoother tell you? 
+
+3. Suppose you plotted the distribution of feelings toward Trump (`fttrump`), and saw a big spike in support at the value of `998`. What would this tell you and how would you know? What would be some exploratory follow-up steps you could take in response?
+
+
+
+
+
+
+
+
+```{r}
+
+# SOLUTIONS...
+
+# 1.
+NESdta %>%
+  select(starts_with("ft")) %>% 
+  mutate(fttrump = replace(fttrump, fttrump > 100, NA),
+         ftobama = replace(ftobama, ftobama > 100, NA),
+         ftblack = replace(ftblack, ftblack > 100, NA),
+         ftcarson = replace(ftcarson, ftcarson > 100, NA),
+         ftcruz = replace(ftcruz, ftcruz > 100, NA)) %>% 
+  skim()
+
+# 2.
+obama <- NESdta_sub %>% 
+  select(ftobama, gender, birthyr) %>% 
+  sample_n(ftobama, 50)
+
+ggplot(obama, aes(birthyr, ftobama, color = gender))+
+  geom_point() + 
+  geom_smooth(method = "loess") +
+  theme_bw()
+
+```
+
+
+##
+##
+# Basic Statistics in R
+
+
+There are so many approaches to fitting statistical models, as we likely all know. So here, with the goal being a focus on an intro to R, not stats, let's take a quick look at a few common statistical techniques: correlation, OLS, and logistic regression.
+
+We continue with our ANES dataset and will focus on a constrained set of features:
+
+1. `fttrump`: Feeling thermometer for Trump in 2016 (from 1 to 100, where 1 = Cold and 100 = warm)
+2. `pid3`: Respondent's party affiliation (1 = Democrat, 2 = Independent, 3 = Republican)
+3. `birthyr`: Respondent's birth year
+4. `gender`: Respondent's gender (1 = male and 2 = female) 
+5. `ftobama`: Feeling thermometer for Obama in 2016 (from 1 to 100, where 1 = Cold and 100 = warm)
+
+First, we need to load some relevant packages and load the corresponding libraries.
+
+```{r eval = FALSE, echo = TRUE}
+library(tidyverse)
+library(corrr)
+library(skimr)
+library(hexbin)
+library(amerika)
+library(broom)
+```
+
+With the packages loaded, we now load our data, `NESdta`, and munge a bit as before.
+
+```{r eval = FALSE, echo = TRUE}
+NESdta <- read_csv(file.choose())
+
+NESdta_sub <- NESdta %>%
+  dplyr::select(fttrump, pid3, birthyr, gender, ftobama) %>%
+  mutate(fttrump = replace(fttrump, fttrump > 100, NA),
+         ftobama = replace(ftobama, ftobama == 998, NA),
+         Party = case_when(pid3 == 1 ~ "Democrat",
+                           pid3 == 2 ~ "Republican",
+                           pid3 == 3 ~ "Independent"),
+         female = ifelse(gender == 2, 1, 0)) %>%
+  as.data.frame() %>%
+  drop_na()
+```
+
+To inspect the data first, we start with a density plot, using `geom_hex`, where individual hexagons correspond with groupings of respondents. The legend indicates that lighter shades of blue mean more respondents at the given levels of the $X$ and $Y$ axes. Thus, we explore the density of respondents across the `fttrump` and `ftobama` variables to get a first look at whether respondents naturally vary in preferences for candidates of different parties, as we might expect they would.
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(NESdta_sub, aes(fttrump, ftobama)) +
+  geom_hex(bins = 40) +
+  labs(x = "Trump Feeling Thermometer",
+       y = "Obama Feeling Thermometer",
+       fill = "Count") +
+  theme_bw()
+```
+
+Sure enough, we can see clusters of respondents in the upper left and lower right corners of the hex density plot, suggesting that respondents who really favor Obama (higher values on the Y axis) tend to also really oppose Trump (lower values on the $X$ axis). 
+
+A natural next step to see how strong the relationship is between these two variables is to check the correlation between them. Correlation is also often used to diagnose collinearity and other issues. Pearson's correlation coefficient, $\rho$, which is the most commonly used, ranges from -1 for a perfect negative correlation to 1 for a perfect positive correlation, with 0 indicating no correlation. The `corrr` package provides a range of highly useful modifications to the standard R correlation function.
+
+So let's select the variables plotted above and find their correlation. This can be accomplised with the following code.
+
+```{r eval = FALSE, echo = TRUE}
+correlation <- NESdta_sub %>%
+  dplyr::select(ftobama, fttrump) %>%
+  correlate()
+
+correlation
+```
+
+The resulting tibble shows that there is a moderate negative relationship between approval of Trump and approval of Obama. It also shows a small positive correlation between birth year and support of Obama (younger people give him a higher rating), and a small negative correlation for approval of Trump (older people give him a higher rating).
+
+### Fitting an OLS Model
+
+With our data loaded and explored, as well as a quick check for correlations between variables of interest, we can now fit a simple bivariate linear regression (OLS) model, predicting feelings toward Trump (`fttrump`) as a function of respondents' ages (`birthyr`). By fitting this model, we are assuming some linear relationship between respondents' ages and their feelings toward Trump. A naive, but perhaps reasonable expectation would be that younger respondents have more negative (or "cold") feelings toward Trump. 
+
+To get a sense of this, consider the simple regression using the `lm()` function ("linear model") from base R. We store the model in object `reg_simple`. Once we have the model object saved, instead of using the `summary()` function from base R to display the results of the model, the `broom` package offers a "tidy" version of summarizing model objects in a cleaner, more robust way. Specifically, we will use the `tidy()`, `augment()`, and `glance()` functions from `broom` to explore our model in detail at both the variable and model levels.
+
+```{r eval = FALSE, echo = TRUE}
+reg_simple <- lm(fttrump ~ birthyr, 
+                 data = NESdta_sub)
+```
+
+Now, regarding the model results, we can first call the `tidy()` function for a simple, clean, and distilled description of the model output.
+
+```{r eval = FALSE, echo = TRUE}
+tidy(reg_simple)
+```
+
+The output includes `estimate`, `std.error`, `statistic`, and `p.value`. The `estimate` is the $\beta$ coefficient, while the `std.error` is the measure of uncertainty surrounding that estimate. Then significance of this effect is captured by the `statistic` (usually either Z or t), as well as the `p.value`, where smaller values are better suggesting a lower probability of observing this estimated effect due to chance. To interpret our model, we start with the $\beta$ coefficients, which are the effects we are estimating. We interpret these values as, "a one unit change in $X$ causes a $\beta$ change in $Y$."
+
+Next, `augment()` is another powerful function in `broom` that provides much more *variable*-level information useful for analysis. This function call returns verbose output including, e.g., fitted values (`.fitted`), residuals (`.resid`), cook's distance (`.cooksd`, a measure of outliers discussed more below with diagnostics), and so on.
+
+```{r eval = FALSE, echo = TRUE}
+augment(reg_simple)
+```
+
+Finally, `broom` has another function, `glance()`, that returns *model*-level output, including $R^2$, log-likelihood values, AIC, BIC, degrees of freedom, and so on. See the output and inspect the package documentation for exhaustive details on the package and functions (i.e., `?broom`).
+
+```{r eval = FALSE, echo = TRUE}
+glance(reg_simple)
+```
+
+Returning to the output, the negative $\beta$ coefficient for `birthyr` suggests that younger respondents indeed have more negative feelings toward Trump. This is "significant" at the strict $p < 0.01$ level. We can also visualize our model by plotting it and overlaying a "best fit" line using `ggplot()` and adding a linear smoother layer (`geom_smooth()`) with confidence intervals around the line via `se = TRUE`.
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(NESdta_sub, aes(x=birthyr, y=fttrump)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(x = "Birth Year",
+       y = "Trump Feeling Thermometer Score",
+       title = "The Effect of Age on Trump Feelings") +
+  theme_bw()
+```
+
+Now, we may worry about other effects, such as party affiliation, that may _also_ influence feelings toward Trump. We store the model in object `reg_multiple`, and then after calculate predicted feelings toward Trump at the mean levels for each political party, while holding the other variable (`birthyr`) at its mean level using two powerful commands: `tibble` (the Tidyverse version of a "table") and `predict`.
+
+```{r eval = FALSE, echo = TRUE}
+reg_multiple <- lm(fttrump ~ birthyr + Party, 
+                   data = NESdta_sub); tidy(reg_multiple)
+
+predict(reg_multiple, tibble(Party = c("Democrat", "Republican", "Independent"),
+                             birthyr = mean(NESdta_sub$birthyr)))
+```
+
+As we would expect, feelings towards Trump are most positive among Republicans. Even as a candidate who had notably supported many Democrats in the past, Republicans appear to have been drawn to Trump to a much greater extent than Independents. We will come back to this point later in the chapter.
+
+#### Exercises On Your Own
+
+1. Create a similar regression model for support for Obama. Are the results different from what you saw in your model of support for Trump? If so how? If not, why do you think this is the case?
+
+2. Fit a regression model predicting support for Trump as a function of an _interaction_ between political party affiliation and gender. What do you find?
+
+### Regression Diagnostics
+
+Let's take a quick look at some common diagnostic checks for linear models are: *multicollinearity* and *influential observations*. There are a few methods for checking for these, but we will focus on three: variance inflation factor ("vif") for multicollinearity and then DFBETA scores and Cook's distance for influential observations. 
+
+#### Multicollinearity
+
+First, for multicollinearity, this is when we have multiple regressors explaining a lot of the same variance in our dependent variable. Recall the main goal of regression is to explain as much *unique* variance in a response variable, with a parsimonious a model. Thus, when two variables are highly correlated, we encounter a lot of overlapping variance being explained, or multicollinarity. VIF checks across every regressor in the full model, and then checks how much the variance of the model shifts when a vairable is included versus when it is excluded. The simplest statistic for variance explained is the $R^2$. Thus, the formula is $1/1-R^2_j$. The `vif()` function from the `car` packages is quite simple, requiring only the model be supplied as input.
+
+```{R eval = FALSE, echo=TRUE}
+# First fit a multiple regression model
+reg_full <- lm(fttrump ~ birthyr + Party + female,
+               data = NESdta_sub); tidy(reg_full)
+
+library(car)
+
+vif(reg_full)
+```
+
+
+
+#### Influential Observations and Outliers
+
+Next, we can check for outliers that may be exerting a larger than expected amount of leverage or pull on the linear fit line explaining the data. We can check for these by viewing a few plots based on calculations including DFBETA scores first, followed by Cook's Distance. Note that you can inspect residual vs. fitted value plots in base R by simply plotting the `lm` object. However, a more recent package, `olsrr`, addresses these methods (and several others) using `ggplot2`, a Tidyverse mainstay, to render the output. As such, we leverage the `olsrr` package to check for outliers using each of these methods in turn. 
+
+We start with DFBETA scores. DFBETAs check for the influence of each observation on the _parameter_ estimates, and then plots the change in parameter ($\beta$) size when each observation is deleted. 
+
+```{R eval = FALSE, echo = TRUE}
+reg_full <- lm(fttrump ~ birthyr + Party + gender,
+               data=NESdta_sub); tidy(reg_full)
+
+library(olsrr)
+
+ols_plot_dfbetas(reg_full)
+```
+
+Finally, we turn to Cook's distance, which as mentioned above, caluclates the influence of each observation on the fitted (predicted) values. It is a useful way to detect outliers, and more specifically, whether any outliers may be troublesome for our estimates (i.e., pulling the regression fit line toward their location in space). We can simply calculate and plot these in the Tidyverse by passing the model object to the `ols_plot_cooksd_chart()` function from the `olsrr` package.
+
+```{R eval = FALSE, echo=TRUE}
+ols_plot_cooksd_chart(reg_full) + 
+  geom_hline(yintercept = 0.121)
+```
+
+
+#### Exercise On Your Own
+
+1. Run these diagnostics on your regression for support for Obama from the previous section. Are there any outliers or issues you notice in this regression?
+
+
+### Saving Regression Results
+
+Even if you follow best practices and present your results visually, you will likely need to provide a table of your regression results at some point. Here again, the `stargazer` package is useful for automatically generating these tables. 
+
+```{r eval = FALSE, echo = TRUE}
+stargazer(reg_simple, reg_multiple,
+          dep.var.labels = c("Approval of Trump"),
+          covariate.labels = c("Birth Year",
+                               "Independent",
+                               "Republican"),
+          type = "html",
+          out = here("tables", "ols_models.doc"))
+```
+
+As we noted before, there are a number of different options with `stargazer`, so take some time to play around with these to find your favorite table format.
+
+#### Exercises On Your Own
+
+1. Create a table that includes a bivariate model and a multivariate model of support for Obama (`ftobama`). Save it and open it in Microsoft Word or another word processing program. 
+
+2. Add a number of different models to the same table. Take the table for approval of Trump (`fttrump`) above and add the bivariate and multivariate models for approval of Obama (`ftobama`). *Be sure to modify the labels accordingly*. 
+
+3. What is the difference between `kable()` and `stargazer()`? (*hint*: consider looking into the `knitr` package in the Tidyverse)
+
+
+
+##
+##
+## Binary Response Models
+
+Fitting a binary response model in R is nearly as straightforward as fitting a linear model. This time, though, we will use the `glm()` function instead of `lm()`, as logistic and probit regressions are *generalized* linear models (hence the "g" in the "glm" function).
+
+First, we need to load a few new libraries and then create a binary response variable. To do the latter, we will call it `pro_trump`, where over 50% on the Trump feeling thermometer suggests the respondent supports Trump, at least more than opposing him. To create this new variable, we use the `ifelse` command in base R, but within a Tidyverse framework. Ultimately, we are interested in predicting the likelihood of supporting Trump, relative to *not* supporting him. In other words, we are interested in the probability of moving from a 0 (no support) to a 1 (support). 
+
+```{r eval = FALSE, echo = TRUE}
+# load some packages/libraries first
+library(faraway)
+library(foreign)
+library(ggplot2)
+library(arm)
+library(MASS)
+library(OOmisc) # for ePCP fit statistics
+library(pROC) # for plotting ROC curves
+library(lmtest) # for likelihood ratio tests
+library(skimr)
+```
+
+```{r eval = FALSE, echo = TRUE}
+# create new "pro_trump" var for prediction
+NESdta_sub <- NESdta_sub %>%
+  mutate(pro_trump = ifelse(fttrump >= 50, 1, 0)) %>%
+  drop_na()
+
+# inspect to make sure everything looks right
+sample_n(tibble(NESdta_sub$pro_trump), 5) # five random obs, 0 and 1 as expected
+table(NESdta_sub$pro_trump) # whole df: 665 = 0; 450 = 1
+```
+
+### Showing Logit and Probit are (Virtually) Identical
+
+To quickly demonstrate that logit and probit are basically the same, but really to have another opportunity to learn new tricks in R, we first fit a logit model, and then a probit model to estimate the relative impact of respondents' ages (`birthyr`) on the likelihood of being "pro-Trump". Note, the only thing we are changing in thes models is the link function, from `logit` to `probit`. We store each model in objects `logit` and `probit`.^[Note that the update to the `glm()` function compared to the `lm()` function is the inclusion of `family` argument. This is where we tell the function that we are interested in the binomial family, and that we want either a logit or a probit link *within the binomial family*.]
+
+```{r eval = FALSE, echo = TRUE}
+logit <- glm(pro_trump ~ birthyr,
+                family = binomial(link = logit),
+                NESdta_sub); tidy(logit)
+
+probit <- glm(pro_trump ~ birthyr,
+                 family = binomial(link = probit),
+                 NESdta_sub); tidy(probit)
+```
+
+Importantly, raw coefficients from logit and probit models are not extremely helpful on their own. So let's turn these into predicted probabilities. To do so, and thus compare both numerically and visually, we can show the predicted probabilities for being pro-Trump for specific levels of age. We will show for the oldest respondent (born in 1921), the median respondent (born in 1967) and then the youngest respondent (born in 1997). We obtain these values using `skim()`. We then calculate and store the predicted values at each level by simply plugging the intercept ($\beta_0$) and slope ($\beta_j$) coefficients into either `ilogit` or `pnorm` for logit and probit models, respectively. The reason for this choice is because the logit requires the inverse logistic distribution, while the probit requires the normal distribution to turn these coefficient values into predicted probabilities for more intuitive interpretation. We then store these in a transposed tibble using the `tribble()` function to offer a cleaner look at predicted probabilities by age level.
+
+```{R eval = FALSE, echo=TRUE}
+# get the different values for min, med, and max birth year first
+skim(NESdta_sub$birthyr)
+
+# calculate and store prediction when birth year is at its min, median, and max
+l_min <- ilogit(32.52570 + (-0.01673) * 1921) #min
+p_min <- pnorm (20.263235 + (-0.010424) * 1921) #min
+l_med <- ilogit(32.52570 + (-0.01673) * 1967) #median
+p_med <- pnorm (20.263235 + (-0.010424) * 1967) #median
+l_max <- ilogit(32.52570 + (-0.01673) * 1997) #max
+p_max <- pnorm (20.263235 + (-0.010424) * 1997) #max
+
+Predictions_Logit_Probit <- tribble( # using "tribble" a transposed tibble
+  ~` `, ~Logit, ~Probit,
+  "Minimum Birth Year (1921)", l_min, p_min,
+  "Median Birth Year (1967)", l_med, p_med,
+  "Maximum Birth Year (1997)", l_max, p_max
+)
+Predictions_Logit_Probit
+```
+
+Indeed, in line with the earlier OLS findings, younger respondents are much less likely to be in the pro-Trump camp, while older respondents are most likely to be in the pro-Trump camp. Let's visualize the fitted values. If they are the same, then we would expect a perfectly diagonal 45 degree line from the lower left to the upper right. To do this, we will use the `qplot()` function, which is the "quickplot" version of a `ggplot`.
+
+```{r eval = FALSE, echo = TRUE}
+logit_phat <- logit$fitted.values # vector of fitted values from logit model
+probit_phat <- probit$fitted.values # same for probit
+
+hat_data <- tibble(logit_phat, probit_phat)
+#hat_data # uncomment to inspect, if you'd like
+
+qplot(logit_phat, probit_phat,
+      data = hat_data,
+      geom = "point",
+      xlab = "Logit Predicted Probabilities",
+      ylab = "Probit Predicted Probabilities",
+      main = "Comparing Logit & Probit Predictions") +
+  theme_bw()
+```
+
+Indeed, it is clear that the logit and probit are virtually identical. Thus, we will proceed with only logit.
+
+
+
+### A Multivariate Model
+
+Here we store the multivariate version in the object `mult_logit`, and also make `Party` a factor for the sake of plotting below. Syntax is basically the same as for `lm()`.
+
+```{r eval = FALSE, echo = TRUE}
+mult_logit <- glm(pro_trump ~ birthyr + factor(Party) + gender,
+                family = binomial(link = logit),
+                NESdta_sub); tidy(mult_logit)
+```
+
+With a more fully specified model controlling for additional factors (party and also gender), we can get a more reliable sense of these magnitude of these effects by generating out-of-sample predicted probabilites, ranging over the birth year and holding the effect of gender at its mean value. 
+
+```{r eval = FALSE, echo = TRUE}
+# out of sample predicted values
+# let birth year range (and do this 300 time for each level of party id)
+# hold gender effect at mean; let party id range for each level, 100 times each
+sub_data <- with(NESdta_sub, tibble(birthyr = rep(seq(from = 1921, 
+                                                      to = 1997, 
+                                                      length.out = 100), 
+                                                  3),
+                                    gender = mean(gender),
+                                    Party = factor(rep(c("Democrat",
+                                                         "Republican",
+                                                         "Independent"),
+                                                         each = 100))))
+
+# combine predicted values and SEs based on "sub_data"
+pred_data <- cbind(sub_data, predict(mult_logit,
+                                    newdata = sub_data,
+                                    type = "link",
+                                    se = TRUE))
+
+# calculate and store lower limit (LL) and upper limit (UL) values
+# attach to predicted values data frame created in "pred_data"
+pred_data <- within(pred_data, {
+  PredictedProb <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+```
+
+With our out-of-sample data frame created, we can now plot these results with unique lines and confidence intervals for each party.
+
+```{r eval = FALSE, echo = TRUE}
+ggplot(pred_data, aes(x = birthyr, y = PredictedProb)) +
+  geom_errorbar(aes(ymin = LL, ymax = UL), alpha = 0.2) +
+  geom_line(aes(color = Party), size = 1) +
+  scale_color_manual(values = amerika_palette("Dem_Ind_Rep3"), name = "Party") +
+  labs(x = "Birth Year",
+       y = "Predicted Probability of Pro-Trump Rating",
+       title = "The Effect of Age and Party on Pro-Trump Rating",
+       subtitle = "Trends are from 300 Out-of-Sample Predictions") +
+  theme_bw()
+```
+
+
+
+### Assessing Model Fit
+
+As with OLS regression, it is vitally important to assess the fit of models in the binary response world as well. We focus on two difference approaches: classification-based (did the model classify observations correctly compared to true values) and the likelihood-based (does model $X$ predict the likelihood of moving from 0 to 1 better than model $Z$?). we start with expected proportion correctly predicted (ePCP) and then we inspect receiver operating characteristic (ROC) curves. We conclude with likelihood ratio tests.
+
+#### Expected Proportion Correctly Predicted (ePCP)
+
+First, using function `ePCP()`, we can calculate the expected proportion correctly predicted (ePCP) statistics associated with each of our logit models (the bivariate and the multivariate). We then store the predicted valus and present them visually across both models. Here, we are interested in which model performs "best." Higher ePCP suggests a better fit, or a higher proportion of correctly classifying Trump supports versus non-supporters.^[We thank Ling Zhu (University of Houston) for sharing some excellent base code used in these assessment tests.]
+
+```{r eval = FALSE, echo = TRUE}
+y <- NESdta_sub$pro_trump
+pred1 <- predict(logit, type="response")
+pred2 <- predict(mult_logit, type="response")
+
+epcp1 <- ePCP(pred1, y, alpha = 0.05)
+epcp2 <- ePCP(pred2, y, alpha = 0.05)
+```
+
+The multivariate iteration has a higher mean ePCP value than the bivariate model, suggesting the more complicated multivariate model fits the data better than the bivariate model. We can also visualize these results.
+
+```{r eval = FALSE, echo = TRUE}
+epcpdata <- data.frame(rbind(epcp1, epcp2))
+epcpdata$model <- c(1,2)
+epcpdata$count <- factor(c(1,2), label = c("Bivariate\nLogit", "Multivariate\nLogit"))
+
+ggplot(epcpdata, aes(x = model, y = ePCP, color = count)) +
+  geom_bar(position = position_dodge(), stat = "identity", fill = "darkgray") +
+  geom_errorbar(aes(ymin = lower, ymax = upper),
+                width = 0.2,
+                position = position_dodge(0.9)) +
+  labs(x="Model Specification",
+       y="Expected Proportion of Correct Prediction",
+       title = "Comparing ePCP between Bivariate and Multivariate Logistic Regressions",
+       colour="Model") +
+  theme_bw()
+```
+
+#### Receiver Operating Characteristic (ROC) Curves
+
+Next, receiver operating characteristic (ROC) curves plot the correct predictions (sensitivity, "true positive" rate) against false predictions (specificity, "false positive" rate). When a model fits well, the area under the curve (AUC) will be greater, where 1 suggests perfect classification. The 45-degree diagonal line is a refernce point, such that we are interested in the model with the curve most distant to the upper left from the diagonal line, suggesting greater, positive AUC, and thus a better fit with more true positives correctly classified, which again is support for Trump ($y = 1$). 
+
+```{r eval = FALSE, echo = TRUE}
+par(mfrow = c(1,2)) # set the pane space to plot side by side (rows, columns)
+plot.roc(y, pred1, col="darkgreen", main = "Bivariate Logit")
+plot.roc(y, pred2, col="darkorange", main = "Multivariate Logit")
+```
+
+Similar to ePCP, we can see much greater AUC for the multivariate model with a curve farther to the upper left compared to the bivariate model, suggesting the multivariate specification fits best.
+
+#### Likelihood Ratio Tests
+
+Finally, we can also assess fit by comparing the fit between models based on the likelihood ratios using the likelihood ratio test. The test statistic is defined as, $LR_{test}= 2lnL(M_B) − 2lnL(M_M)$, where $L(M_B)$ is the likelihood of estimates for the bivariate model and $L(M_M)$ is the likelihood of estimates for the multivariate model.
+
+```{r eval = FALSE, echo = TRUE}
+lrtest(logit, mult_logit)
+```
+
+As the log-likelihood of a model is a measure of fit, we are looking for a significant result (sufficiently small p-value), and the model with a smaller absolute log-likelihood value. Seen from the `lrtest()` output, the multivariate model is indeed a better fitting model to the data than the bivariate model, in line with the previous tests.
+
+#### Exercises On Your Own
+
+1. Repeat the modeling exercise above, but with a dichotomous version of the feeling thermometer for Obama (`ftobama`). How are the results similar or different?
+
+2. Create a table for your logit models of support for Trump and Obama.
+
+
+
+##
+##
+
+# 15 min Break
+
+##
+##
+
+
+# Basic Natural Language Processing
+
+```{r eval = FALSE, echo = TRUE}
+# Load libraries
+library(tm)
+library(grid)
+library(wordcloud)
+library(wordcloud2)
+library(tidyverse)
+
+
+# LOADING TEXTS
+## FOR MAC:
+texts <- file.path("~", "Desktop", "trump") # load Trump speeches in "trump" file
+dir(texts) # inspect the texts
+
+## FOR PC:
+#texts <- file.path("C:", "trump")
+#dir(texts)
+
+# Now we can create our raw corpus, which we will preprocess in a moment
+docs <- VCorpus(DirSource(texts))
+summary(docs)
+
+# read each document
+writeLines(as.character(docs[1]))
+
+
+#
+# PREPROCESSING
+
+# Start with punctuation
+docs <- tm_map(docs, removePunctuation)
+writeLines(as.character(docs[1])) # Check the corpus... did it work? 
+
+
+# Maybe we need a bit more cleaning of unique characters
+for (j in seq(docs)) {
+  docs[[j]] <- gsub("/", " ", docs[[j]])
+  docs[[j]] <- gsub("’", " ", docs[[j]])
+  docs[[j]] <- gsub("—", " ", docs[[j]])
+  docs[[j]] <- gsub("\\|", " ", docs[[j]])
+  docs[[j]] <- gsub("@", " ", docs[[j]])
+  docs[[j]] <- gsub("\u2028", " ", docs[[j]])  # an ascii character that does not translate
+}
+writeLines(as.character(docs[1])) # always inspect
+
+# We can now update our recent update (minus punctuation) by redefining "docs" to remove numbers
+docs <- tm_map(docs, removeNumbers)
+writeLines(as.character(docs[1])) # inspect again
+
+# For consistency, we may also want to remove captialization
+docs <- tm_map(docs, tolower)
+(docs <- tm_map(docs, PlainTextDocument))
+
+
+# Next, remove superfluous words like articles or words with no substantive value for analysis
+## For a list of the stopwords, run: stopwords("english")  
+#  And you can use this to see how many there are (174): length(stopwords("english"))
+docs <- tm_map(docs, 
+               removeWords, 
+               stopwords("english"))
+docs <- tm_map(docs, PlainTextDocument) # redefine
+
+# manually removing words too for your specific purposes (e.g., our "representative" or "honourable" example Tuesday)
+docs <- tm_map(docs, removeWords, c("will")) # trump says "will" a ton (try leaving "will" in; most frequently used)
+
+# There are some words that tm pulls apart that should stay together; manually define for each document, j:
+for (j in seq(docs)) {
+  docs[[j]] <- gsub("fake news", "fake_news", docs[[j]])
+  docs[[j]] <- gsub("inner city", "inner-city", docs[[j]])
+  docs[[j]] <- gsub("I m", "I'm", docs[[j]])
+  docs[[j]] <- gsub("politically correct", "politically_correct", docs[[j]])
+}
+docs <- tm_map(docs, PlainTextDocument) # redefine docs
+
+# We can also omit certain "stems" or common English word endings (e.g., ing, es)
+docs_st <- tm_map(docs, stemDocument) # note that we are storing this in a new corpus to give ourselves some options for analysis later
+docs_st <- tm_map(docs_st, PlainTextDocument) 
+
+# Preprocessing leaves behind a lot of white space, or extra spaces between words or lines
+docs <- tm_map(docs, stripWhitespace)
+docs <- tm_map(docs, PlainTextDocument) # final redefine for retaining the lataest preprocessing steps
+
+
+#
+# STAGING: "DocumentTermMatrix" from tm
+# Create dtm (matrix of term frequencies per document); other packages also do this, e.g., qdap
+
+# dtm: each document is a row, and each term is a column
+dtm <- DocumentTermMatrix(docs)
+
+# Or, transpose of a dtm == tdm
+# --> tdm: each word is a row (frequency of usage), and each document is a column
+tdm <- TermDocumentMatrix(docs)
+
+
+#
+# EXPLORE numerically
+# with preprocessed and staged text, we can now explore trump's speeches
+
+frequency <- sort(colSums(as.matrix(dtm)), 
+                  decreasing=TRUE) # add number of times each term is used, and sorting based on frequency of usage
+head(frequency) # most frequently used words
+
+# what is the most common term used?
+frequency[1]
+
+# We can also tailor the search of terms by frequency used
+findFreqTerms(dtm, lowfreq = 100) # narrows by words used more than 100 times (or whatever threshold you set), which are 14 words
+
+# same thing, another way - verify that there are 14 words used over 100 times
+wf <- data.frame(word = names(frequency), 
+                 freq = frequency)
+head(wf, 15)  # sure enough, the 15th word is used less than 100 times
+
+# Export the corpus to a .csv if you don't want to repeat the steps above, and wish to use this in the future
+#trump.speech.corpus <- as.matrix(dtm)
+#write.csv(trump.speech.corpus, "trump.speech.corpus.csv")
+
+# We can also explore relationships between word usage (pre-cursor to topic models) - e.g., what is the correlation of words being used together
+findAssocs(dtm, 
+           terms = "great", 
+           corlimit = 0.90) # manually locate terms, and then specify the correlation threshold
+
+findAssocs(dtm, 
+           terms = c("great" , "america"), 
+           corlimit = 0.90) # multiple words
+
+findAssocs(dtm, 
+           terms = "hell", 
+           corlimit = c(0.75, 0.5)) # multiple correlation thresholds
+
+
+#
+# EXPLORE visually
+## Visualize the frequencies as bar plots
+
+# words used more than 100 times
+words.100 <- ggplot(subset(wf, freq > 100), aes(x = reorder(word, -freq), y = freq)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=55, hjust=1)) +
+  labs(x = "Term")
+words.100
+
+# words used more than 75 times
+words.75 <- ggplot(subset(wf, freq > 75), aes(x = reorder(word, -freq), y = freq)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=55, hjust=1)) +
+  labs(x = "Term")
+words.75
+
+# words used more than 50 times
+words.50 <- ggplot(subset(wf, freq > 50), aes(x = reorder(word, -freq), y = freq)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  labs(x = "Term")
+words.50
+
+# words used more than 35 times
+words.35 <- ggplot(subset(wf, freq > 35), aes(x = reorder(word, -freq), y = freq)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  labs(x = "Term")
+words.35
+
+# view in a grid
+vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(2, 2)))
+print(words.100, vp = vplayout(1, 1))
+print(words.75, vp = vplayout(1, 2))
+print(words.50, vp = vplayout(2, 1))
+print(words.35, vp = vplayout(2, 2))
+
+
+## Wordclouds: larger size = greater usage
+# back to minimum usage of 100 times - not too useful though, as wordclouds are better with many terms to see patterns
+set.seed(2345) # specifies start/end, making configuration consistent for each plot
+wordcloud(names(frequency), frequency, min.freq = 100)
+
+# thus, let's visualize the 150 most frequently used terms
+set.seed(2345)
+wordcloud(names(frequency), frequency, max.words = 150)
+
+# and of course, some color is good
+# using brewer palette, we can first choose the color scheme we like best, and then specify it below in our word cloud
+display.brewer.all(n = NULL, type = "all", select = NULL, exact.n = TRUE,
+                   colorblindFriendly = FALSE)
+
+# And to manually add a title and for a better-formatted WC...
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 6))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, "Trump Speeches Term Frequency Wordcloud")
+# Now, generate and overlay the fully formatted wordcloud to result in a good visualization
+wordcloud(names(frequency), frequency,
+          min.freq = 1, # terms used at least once
+          max.words = 300, # 300 most frequently used terms
+          random.order = FALSE, # centers cloud by frequency, > = center
+          rot.per = 0.30, # sets proportion of words oriented horizontally
+          main = "Title",
+          colors = brewer.pal(8, "Dark2")
+          )  
+
+
+# via wordcloud2 - animated
+# options: 'circle', 'cardioid', 'diamond', 'triangle-forward', 'triangle', 'pentagon', and 'star'
+wordcloud2(wf,
+           shape = "diamond")
+
+#
+```
+
+
+```{r}
+## Some other useful text mining code -- Example: exploring css related papers submitted to the arXiv
+library(aRxiv) # API interface
+library(lubridate) # for time measures
+library(tidyverse) # munging/stacking
+library(skimr) # EDA
+
+# SQL query of papers with "Computational Social Science" keyword(s)
+css_papers <- arxiv_search(query = '"Computational Social Science"', 
+                           limit = 100)
+
+# Inspect the documents, e.g., title, abstract, authors, etc.
+head(css_papers$title)
+head(css_papers$abstract)
+head(css_papers$authors)
+
+# Define measures of time for EDA
+css_papers <- css_papers %>% 
+  mutate(submitted = ymd_hms(submitted),
+         updated = ymd_hms(updated))
+
+skim(css_papers)
+
+# Make a corpus out of the abstracts; inspect the first paper's abstract
+css_abstracts <- with(css_papers, 
+                      VCorpus(VectorSource(abstract)))
+
+css_abstracts[[1]] %>% # call first paper in the corpus
+  as.character() %>% # character class
+  strwrap() # makes it read like a paragraph
+
+# Light preprocessing
+css_abstracts <- css_abstracts %>% 
+  tm_map(stripWhitespace) %>% 
+  tm_map(removeNumbers) %>% 
+  tm_map(removePunctuation) %>% 
+  tm_map(content_transformer(tolower)) %>% 
+  tm_map(removeWords, stopwords("english"))
+
+css_abstracts[[1]] %>% # call first paper in the corpus
+  as.character() %>% # character class
+  strwrap() # makes it read like a paragraph
+
+# Make a wordcloud
+wordcloud(css_abstracts,
+          max.words = 150,
+          colors = brewer.pal(15, "BrBG"),
+          random.color = TRUE)
+```
+
+
+
+
+
+# If time...
+
+If we have some remaining time, I will leave it to you to decide what you'd like to take a quick look at (I have some good tidy-oriented code for all of this based mostly on my teaching):
+
+  * Topic Models and Sentiment Analysis (using `SOTU` data)
+  * Machine learning-flavored classification task (using `ANES` data)
+  * Support vector machines (using simulated data)
+
+
+
+
+
+# Parting Thoughts 
+
+We have covered a very concise introduction to R and the Tidyverse. I hope you have the tools and understanding you need to set you off on your journey. But you may be wondering where you go from here. As we said in the beginning, learning to program is not always an easy process, but you fill find that these tools will open areas of research that you never thought of before you learned to program. As the old saying goes, "If all you have is a hammer, everything begins to look like a nail." Learning to program and use R will open up all kinds of new tools that will change the way you view your research. Neither of us anticipated the kind of work we are doing now when we started graduate school, but learning R opened new avenues far more exciting than what we had originally anticipated.
+
+
+
+
+## Continuing to Learn with R
+
+As you leave, one thing is more important than any other for you to learn R -- use R. You probably have heard of other tools for research that offer a simpler (at least at first) way to accomplish what you want to do. SPSS and Stata have dropdown menus -- why not do basic analyses there? The answer is that you will not learn R if you are only using it every once in a while, when you need to do something you cannot do in another language. We will not go as far as one well-known scholar who claimed to do his taxes in R, but you will not really learn without continuous use. Try to use R as your first choice for analysis, and only use another program if you find yourself in a situation in which it is really needed. R should become your default. This is part of the reason we emphasized data management and visualization. Since these are the tasks that begin just about any project, you have no excuse not to start with R.
+
+As you program with R, you will build a base of code that you will continue to use as you work. Remember to save the scripts that you write. You will find that you can re-use your code over and over. And, as you develop a base of scripts, you will find that working in R becomes much faster (and faster than using dropdown menus all the time). 
+
+Related to this, it is a good idea to go ahead and subscribe for daily emails from [R-Bloggers](https://www.r-bloggers.com/). This will give you exposure to many of the exciting projects that are being done by others in R, and will allow you to see the many opportunities using R opens to your research. Many places also have dedicated groups for using R or data science more generally, where you can meet other R users and participate in fascinating projects, no matter your level of skill. You can find many of these on [Meetup](https://www.meetup.com/). 
+
+Finally, be patient with yourself. There is the old story (perhaps apocryphal) that Einstein told a student, who claimed to have difficulty with math, "Do not worry about your difficulties in mathematics. I can assure you mine are still greater." All of us have had situations where we have struggled to get a particular piece of code to run correctly, or have received an error message we do not understand. Keep working on it and looking for help. It may take a while, but there is no greater feeling than conquering, and mastering, a task that you have struggled with previously. Celebrate your accomplishments, and persist through your difficulties.
+
+## Where To Go From Here
+
+As we have mentioned in several places, our online companion site provides code examples of several other common (and some uncommon) tasks in R. You can download these and add them to your code base.
+
+To discover specific packages in R that are useful for a particular statistical model or task, there is also the [CRAN Task Views](https://cran.r-project.org/web/views/), which provides a curated list of packages available for all kinds of analysis, from Bayesian statistics to network analysis and machine learning. 
+
+Many scholars have also put together books that will help you as you work with R in more specific circumstances, and many of these are available online (many at no cost). A compendium of these books can be found at https://www.r-project.org/doc/bib/R-books.html. 
+
+A few more specific books that you might pick up after my and Ryan Kennedy's book (upon which this workshop was based...;):
+
+-- Hadley Wickam's R for Data Science. This book provides a more comprehensive picture of what you can do in the Tidyverse. It is much more valuable, however, once you already have some basic familiarity working with R and the basics of the Tidyverse, as it is written for an audience with some level of prior programming experience. The book is available in print, as an electronic book, or online for free (https://r4ds.had.co.nz/).
+
+-- Quan Li's "Using R for Data Analysis in Social Sciences." Li provides an excellent introduction to base R, and also goes into much greater detail on specific statistical models and, in particular, how to replicate studies in the social sciences.
+
+-- Kieran Healy's "Data Visualization: A Practical Introduction." This book privides an overview of the graphical capabilities in R using practical examples using `ggplot2`.
+
+-- For those interested in Bayesian statistics using R, we cannot recommend Richard McElreath's Statistical Rethinking highly enough. It is both entertaining and enlightening, and uses R to demonstrate important statistical concepts with which any researcher should be familiar.
